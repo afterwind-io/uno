@@ -1,0 +1,5 @@
+build/
+db/
+mongo/
+node_modules/
+robomongo-0.9.0-rc10/
