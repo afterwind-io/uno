@@ -1,6 +1,6 @@
 <template>
     <div class="Component">
-        <h2>chat</h2>
+        <h2>Chat</h2>
         <div class="chatsContainer">
           <p v-for="chat in chats">{{chat.content}}</p>
         </div>
@@ -11,6 +11,7 @@
 
 <script>
 import ws from '../services/websocket.js'
+import shared from '../services/shared.js'
 
 let _chats = []
 let _msg = ''
@@ -19,8 +20,9 @@ ws.init()
 let _socket = ws.register ('main', (res) => {
   switch (res.title) {
     case 'login':
-      if(res === 'fail') _chats.push('聊天室登录失败。')
-      else _chats.push('聊天室登陆成功。')
+      res === 'fail'
+        ? _chats.push('-聊天室登录失败-')
+        : _chats.push('-聊天室登陆成功-')
       break
     case 'chat':
       _chats.push(res)
@@ -30,12 +32,14 @@ let _socket = ws.register ('main', (res) => {
   }
 })
 
-_socket.send({
-  title: 'login',
-  content: ''
-})
 
 export default {
+  ready(){
+    _socket.send({
+      title: 'login',
+      content: ''
+    })
+  },
   props: [],
   data () {
     return {
@@ -47,7 +51,7 @@ export default {
     send (event) {
       _socket.send({
         title: 'chat',
-        content: this.msg
+        content: `[${shared.playerName}] ${this.msg}`
       })
       this.msg = ''
     }
@@ -55,6 +59,6 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 
 </style>

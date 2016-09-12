@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import routes from './routes.js'
+import routes from './services/routes.js'
 
 const app = new Vue({
   el: '#app',
@@ -17,6 +17,5 @@ const app = new Vue({
 })
 
 window.addEventListener('hashchange', () => {
-  console.log('www')
   app.currentRoute = window.location.hash
 })

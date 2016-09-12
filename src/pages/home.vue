@@ -14,6 +14,7 @@
 import api from '../services/api.js'
 import ws from '../services/websocket.js'
 import nav from '../services/navigation.js'
+import shared from '../services/shared.js'
 
 export default {
   data () {
@@ -32,13 +33,19 @@ export default {
     register () {
       api.register(
         {username: this.user.name, password: ''},
-        (res) => nav.go('lobby')
+        (res) => {
+          shared.playerName = this.user.name
+          nav.go('lobby')
+        }
       )
     },
     login () {
       api.login(
         {username: this.user.name, password: ''},
-        (res) => nav.go('lobby')
+        (res) => {
+          shared.playerName = this.user.name
+          nav.go('lobby')
+        }
       )
     }
   }

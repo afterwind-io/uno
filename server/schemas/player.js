@@ -17,10 +17,10 @@ let playerSchema = new Schema({
  * @param   {object}    info      参数包
  * @param   {Function}  callback  回调函数
  */
-playerSchema.statics.register = function (info, callback) {
+playerSchema.statics.register = function (
+  { username, password, session }, callback
+) {
   let model = this
-  let username = info.username || ''
-  let password = info.password || ''
 
   model.findOne({ name: username }, function (err, p) {
     if (err) {
@@ -36,6 +36,8 @@ playerSchema.statics.register = function (info, callback) {
           return console.log(err)
         }
 
+        session.username = username
+
         callback({code: 0, msg: '注册成功'})
       })
     } else {
@@ -49,10 +51,9 @@ playerSchema.statics.register = function (info, callback) {
  * @param   {object}    info      参数包
  * @param   {Function}  callback  回调函数
  */
-playerSchema.statics.login = function (info, callback) {
-  let username = info.username || ''
-  let password = info.password || ''
-
+playerSchema.statics.login = function (
+  { username, password, session }, callback
+) {
   this.findOne({ name: username }, function (err, p) {
     if (err) {
       return console.log(err)
@@ -68,7 +69,7 @@ playerSchema.statics.login = function (info, callback) {
     }
 
     p.status = playerStatus.idle
-    info.session.username = username
+    session.username = username
 
     p.save(function (err) {
       if (err) return console.log(err)
@@ -83,8 +84,10 @@ playerSchema.statics.login = function (info, callback) {
  * @param   {object}    info      参数包
  * @param   {Function}  callback  回调函数
  */
-playerSchema.statics.logout = function (info, callback) {
-  let username = info.session.username
+playerSchema.statics.logout = function (
+  { session }, callback
+) {
+  let username = session.username
 
   this.findOne({name: username}, function (err, p) {
     if (err) {
@@ -98,7 +101,7 @@ playerSchema.statics.logout = function (info, callback) {
     }
 
     p.status = playerStatus.offline
-    info.session.username = ''
+    // session.username = ''
 
     p.save(function (err) {
       if (err) return console.log(err)
@@ -106,6 +109,27 @@ playerSchema.statics.logout = function (info, callback) {
       return callback({code: 0, msg: '登出成功'})
     })
   })
+}
+
+/**
+ * 获取服务器当前所有在线玩家
+ * @param   {Function}  callback  回调函数
+ */
+playerSchema.statics.getOnlinePlayers = function (callback) {
+  let model = this
+
+  // TODO:
+  let i = (function* () {
+    try {
+      yield model
+        .find({status: playerStatus.idle})
+        .exec()
+    } catch (e) {
+      return console.log(e)
+    }
+  })()
+
+  callback({code: 0, msg: i.next()})
 }
 
 module.exports = mongoose.model('Player', playerSchema)

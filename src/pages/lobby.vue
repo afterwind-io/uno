@@ -2,14 +2,16 @@
   <div class="mainFrame">
     <h1>lobby</h1>
     <input type="button" @click="logout" value="Logout">
+    <players></players>
     <chat></chat>
   </div>
 </template>
 
 <script>
-import chat from '../components/chat.vue'
 import api from '../services/api.js'
 import nav from '../services/navigation.js'
+import chat from '../components/chat.vue'
+import players from '../components/lobby-players.vue'
 
 export default {
   data() {
@@ -26,7 +28,8 @@ export default {
     }
   },
   components: {
-    chat
+    chat,
+    players
   }
 };
 </script>

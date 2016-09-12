@@ -6,7 +6,8 @@ let response = require('../utils/response.js')
 router.post('/register', function (req, res) {
   player.register({
     username: req.body.username,
-    password: req.body.password
+    password: req.body.password,
+    session: req.session
   }, function (result) {
     response.reply(result, res)
   })
@@ -28,6 +29,13 @@ router.post('/logout', function (req, res) {
   }, function (result) {
     response.reply(result, res)
   })
+})
+
+router.post('/getOnlinePlayers', function (req, res) {
+  player.getOnlinePlayers(
+    function (result) {
+      response.reply(result, res)
+    })
 })
 
 module.exports = router

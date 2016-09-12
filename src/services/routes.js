@@ -1,9 +1,9 @@
 import { find } from './util.js'
 
-import home from './pages/home.vue'
-import about from './pages/about.vue'
-import lobby from './pages/lobby.vue'
-import p404 from './pages/404.vue'
+import home from '../pages/home.vue'
+import about from '../pages/about.vue'
+import lobby from '../pages/lobby.vue'
+import p404 from '../pages/404.vue'
 
 const _pages = [
   { name: 'home', uri: '#/', page: home },
