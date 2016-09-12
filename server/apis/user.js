@@ -1,7 +1,7 @@
-var express = require('express')
-var router = express.Router()
-var player = require('../schemas/player.js')
-var response = require('../utils/response.js')
+let express = require('express')
+let router = express.Router()
+let player = require('../schemas/player.js')
+let response = require('../utils/response.js')
 
 router.post('/register', function (req, res) {
   player.register({
@@ -13,7 +13,6 @@ router.post('/register', function (req, res) {
 })
 
 router.post('/login', function (req, res) {
-  console.log(req.session)
   player.login({
     username: req.body.username,
     password: req.body.password,

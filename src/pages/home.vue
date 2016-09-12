@@ -4,7 +4,8 @@
     <h3>Mini Version</h3>
     <p>Player Name:</p>
     <input type="text" v-model="user.name">
-    <input type="button" @click="start" value="Login">
+    <input type="button" @click="register" value="Register">
+    <input type="button" @click="login" value="Login">
     <a :href="page.about">About!</a>
   </div>
 </template>
@@ -28,18 +29,13 @@ export default {
     };
   },
   methods: {
-    start () {
-      // ws.init()
-      //
-      // let io = ws.register('main', ({ title, content }) => {
-      //   switch (title) {
-      //     case 'login':
-      //       if(content === 'ok') return 
-      //     default:
-      //       break;
-      //   }
-      // })
-
+    register () {
+      api.register(
+        {username: this.user.name, password: ''},
+        (res) => nav.go('lobby')
+      )
+    },
+    login () {
       api.login(
         {username: this.user.name, password: ''},
         (res) => nav.go('lobby')

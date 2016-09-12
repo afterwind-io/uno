@@ -1,6 +1,6 @@
-var app = require('./server.js')
-var http = require('http').Server(app)
-var io = require('socket.io')(http)
+let app = require('./server.js')
+let http = require('http').Server(app)
+let io = require('socket.io')(http)
 
 // 启动本地WebSocket服务
 io.on('connection', function (socket) {
@@ -11,9 +11,10 @@ io.on('connection', function (socket) {
       case 'login':
         console.log(msg.content)
         msg.content = 'ok'
-        io.emit('main', msg)
+        socket.emit('main', msg)
         break
       case 'chat':
+        io.emit('main', msg)
         break
       case 'uno':
         break

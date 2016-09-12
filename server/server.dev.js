@@ -1,13 +1,13 @@
-var path = require('path')
-var express = require('express')
-var webpack = require('webpack')
-var webpackConfig = require('../webpack.config.dev.js')
-var compiler = webpack(webpackConfig)
+let path = require('path')
+let express = require('express')
+let webpack = require('webpack')
+let webpackConfig = require('../webpack.config.dev.js')
+let compiler = webpack(webpackConfig)
 
 // 启动本地Webpack Dev Server
-var _app
-var WebpackDevServer = require('webpack-dev-server')
-var server = new WebpackDevServer(compiler, {
+let _app
+let WebpackDevServer = require('webpack-dev-server')
+let server = new WebpackDevServer(compiler, {
   inline: true,
   hot: true,
   stats: { colors: true },

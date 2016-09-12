@@ -1,13 +1,13 @@
-var app = require('./server.js')
-var mongoose = require('mongoose')
-var session = require('express-session')
-var MongoStore = require('connect-mongo')(session)
+let app = require('./server.js')
+let mongoose = require('mongoose')
+let session = require('express-session')
+let MongoStore = require('connect-mongo')(session)
 
 module.exports = {
   start: function (port) {
     mongoose.connect('mongodb://localhost:' + port + '/uno')
 
-    var db = mongoose.connection
+    let db = mongoose.connection
     db.on('error', console.error.bind(console, 'connection error:'))
     db.once('open', function () {
       console.log('DataBase connected on *:' + port)
@@ -15,6 +15,8 @@ module.exports = {
 
     app.use(session({
       secret: '42 Doges',
+      resave: false,
+      saveUninitialized: false,
       store: new MongoStore({
         mongooseConnection: db
       }),

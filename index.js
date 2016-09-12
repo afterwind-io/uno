@@ -1,6 +1,6 @@
 var env = process.env.NODE_ENV || 'dev'
+// var db = require('./server/server.db.js')
 var ws = require('./server/server.ws.js')
-var db = require('./server/server.db.js')
 
 var srv
 switch (env) {
@@ -16,6 +16,6 @@ switch (env) {
 
 var routes = require('./server/routes.js')
 
-db.start('30000')
+// db.start('27017')
 ws.start('3001')
 srv.start('3000')
