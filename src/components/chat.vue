@@ -16,14 +16,8 @@ import shared from '../services/shared.js'
 let _chats = []
 let _msg = ''
 
-ws.init()
-let _socket = ws.register ('main', (res) => {
+let _socket = ws.register (res => {
   switch (res.title) {
-    case 'login':
-      res === 'fail'
-        ? _chats.push('-聊天室登录失败-')
-        : _chats.push('-聊天室登陆成功-')
-      break
     case 'chat':
       _chats.push(res)
       break
@@ -31,7 +25,6 @@ let _socket = ws.register ('main', (res) => {
       break
   }
 })
-
 
 export default {
   ready(){
@@ -51,7 +44,7 @@ export default {
     send (event) {
       _socket.send({
         title: 'chat',
-        content: `[${shared.playerName}] ${this.msg}`
+        content: `[${shared.player.name}] ${this.msg}`
       })
       this.msg = ''
     }

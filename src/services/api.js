@@ -1,4 +1,4 @@
-import { apiServer, apis } from '../config.js'
+import { apiServerUrl, apis } from '../config.js'
 import { findIndex } from './util.js'
 import debug from './debug.js'
 import rest from './restful.js'
@@ -35,16 +35,17 @@ function _apiGen (apis) {
           value: function (data, sc, fc) {
             _debug.done(`[req]<${api.name}> is pending...`, JSON.stringify(data))
 
-            rest[api.method](apiServer + api.uri, data,
-              res => {
-                if (!_requireLock(api.name)) return
+            if (!_requireLock(api.name)) return
 
+            rest[api.method](apiServerUrl + api.uri, data,
+              res => {
+                _releaseLock(api.name)
                 _debug.done(`[req]<${api.name}> fetched.`, res)
-                if (sc) sc(data)
+                if (sc) sc(res)
               },
               res => {
                 _releaseLock(api.name)
-                if (fc) fc(data)
+                if (fc) fc(res)
               }
             )
           }

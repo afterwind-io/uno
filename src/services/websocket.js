@@ -1,29 +1,45 @@
-import { wsServer } from '../config.js'
+import { wsServerUrl } from '../config.js'
 import ws from 'socket.io-client'
+import debug from './debug.js'
 
+const _TUNNEL = 'main'
 let _socket
+let _debugger = debug.getDebugger('ws')
 
-function init () {
-  if (typeof _socket === 'undefined') {
-    _socket = ws(wsServer)
-  }
-}
-
-function register (eventName, callBack) {
-  if (typeof _socket === 'undefined') return
-
-  _socket.on(eventName, callBack)
-
-  function send (name) {
-    return msg => _socket.emit(name, msg)
-  }
-
-  return {
-    send: send(eventName)
-  }
+function _emit (msg) {
+  _debugger.done('[msg] =>', JSON.stringify(msg))
+  _socket.emit(_TUNNEL, msg)
 }
 
 export default {
-  init,
-  register
+  init () {
+    if (typeof _socket === 'undefined') {
+      _socket = ws(wsServerUrl)
+    }
+  },
+  login () {
+    if (typeof _socket === 'undefined') return
+
+    _emit({ title: 'login', content: '' })
+  },
+  logout () {
+    if (typeof _socket === 'undefined') return
+
+    _emit({ title: 'logout', content: '' })
+  },
+  register (callback) {
+    if (typeof _socket === 'undefined') return
+
+    _socket.on(_TUNNEL, msg => {
+      _debugger.done('[msg] <=', JSON.stringify(msg))
+      callback(msg)
+    })
+
+    return {
+      send: _emit
+    }
+  },
+  getSocket () {
+    return _socket
+  }
 }

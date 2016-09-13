@@ -1,8 +1,8 @@
 const server = 'http://localhost'
 
-export var apiServer = server + ':3000'
+export var apiServerUrl = server + ':3000'
 
-export var wsServer = server + ':3001'
+export var wsServerUrl = server + ':3001'
 
 export var apis = [
   { name: 'login', method: 'post', uri: '/api/user/login' },

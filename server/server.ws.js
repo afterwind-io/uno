@@ -4,14 +4,23 @@ let io = require('socket.io')(http)
 
 // 启动本地WebSocket服务
 io.on('connection', function (socket) {
-  console.log('wow')
+  console.log('A client has connected.')
 
   socket.on('main', function (msg) {
+    console.log(msg)
+
     switch (msg.title) {
       case 'login':
-        console.log(msg.content)
-        msg.content = 'ok'
-        socket.emit('main', msg)
+        io.emit('main', {
+          title: 'online status',
+          content: ''
+        })
+        break
+      case 'logout':
+        io.emit('main', {
+          title: 'online status',
+          content: ''
+        })
         break
       case 'chat':
         io.emit('main', msg)
@@ -21,6 +30,10 @@ io.on('connection', function (socket) {
       default:
         break
     }
+  })
+
+  socket.on('disconnect', () => {
+    console.log('A client has disconnected.')
   })
 })
 

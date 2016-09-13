@@ -1,9 +1,12 @@
+let gen = require('../utils/async.js').gen
+
 let mongoose = require('mongoose')
 let Schema = mongoose.Schema
 const playerStatus = {
   offline: -1,
   idle: 0,
-  busy: 1
+  ready: 1,
+  ingame: 2
 }
 
 let playerSchema = new Schema({
@@ -118,18 +121,17 @@ playerSchema.statics.logout = function (
 playerSchema.statics.getOnlinePlayers = function (callback) {
   let model = this
 
-  // TODO:
-  let i = (function* () {
+  gen(function* () {
     try {
-      yield model
+      let players = yield model
         .find({status: playerStatus.idle})
         .exec()
+
+      yield callback({code: 0, msg: players})
     } catch (e) {
       return console.log(e)
     }
-  })()
-
-  callback({code: 0, msg: i.next()})
+  })
 }
 
 module.exports = mongoose.model('Player', playerSchema)

@@ -34,6 +34,15 @@ router.post('/logout', function (req, res) {
 router.post('/getOnlinePlayers', function (req, res) {
   player.getOnlinePlayers(
     function (result) {
+      if (result.code === 0) {
+        result.msg = result.msg.map(r => {
+          return {
+            name: r.name,
+            status: r.status
+          }
+        })
+      }
+
       response.reply(result, res)
     })
 })
