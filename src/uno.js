@@ -42,11 +42,6 @@ class Card {
     return new Card(color, 'clr', '')
   }
 
-  // 用于标识牌局结束
-  static iwin () {
-    return new Card('', 'win', '')
-  }
-
   isLegal (currentState) {
     if (currentState.d4) {
       return this.symbol === 'D4'
@@ -69,8 +64,11 @@ class Card {
            this.symbol === currentState.symbol
   }
 
-  isCardPass () {
-    return this.symbol === 'pass'
+  getScore () {
+    if (this.symbol === 'D4') return 50
+    if (this.symbol === '0') return 10
+    if (['R', 'S', 'C', 'D2'].indexOf(this.symbol) !== -1) return 20
+    return parseInt(this.symbol)
   }
 
   toString () {
@@ -78,6 +76,10 @@ class Card {
     let symbol = padRight(this.symbol, 3)
     let wild = this.wild ? 'true ' : 'false'
     return `Card=[Color: ${color} , Symbol: ${symbol} , Wild: ${wild}]`
+  }
+
+  toShortenString () {
+    return `${this.color} ${this.symbol}`
   }
 }
 
@@ -155,12 +157,11 @@ class Deck {
   pickPenalty (num) {
     if (num > this.deck.length) {
       Deck.shuffle(this.discards)
-      this.deck = this.deck.concat(this.discards)
+      this.deck.push(...this.discards)
       this.discards.length = 0
     }
 
-    let ps = this.deck.splice(0, num)
-    this.penalties = this.penalties.concat(ps)
+    this.penalties.push(...this.deck.splice(0, num))
   }
 
   clearPenalty (num = 0) {
@@ -177,7 +178,7 @@ class Deck {
   }
 
   toss (cards) {
-    this.discards.push(cards)
+    this.discards.push(...cards)
   }
 
 }
@@ -195,7 +196,7 @@ class Player {
   move (state, penalties) {
     switch (state.action) {
       case 'penalty':
-        this.cards = this.cards.concat(penalties)
+        this.cards.push(...penalties)
         return [Card.penalty()]
       case 'skip':
         let skips = this.cards.filter(c => c.symbol === 'S')
@@ -228,9 +229,9 @@ class Player {
   applyStrategy (legalCards) {
     // TODO:
     let card = legalCards.splice(0, 1)
-    let card2 = this.hasDuplicates(legalCards, card)
+    let card2 = this.hasDuplicates(legalCards, card[0])
 
-    if (card2) {
+    if (card2.length !== 0) {
       return card.concat(card2)
     } else {
       return card
@@ -238,7 +239,7 @@ class Player {
   }
 
   hasDuplicates (deck, card) {
-    return deck.filter(c => c.symbol === card.symbol && c.color === c.color)
+    return deck.filter(c => c.symbol === card.symbol && c.color === card.color)
   }
 
   toss (cards) {
@@ -274,7 +275,7 @@ class Uno {
     this.penalty = 1
     this.pointer = 0
     this.direction = 1
-    this.turns = 0
+    this.turns = 1
   }
 
   start () {
@@ -302,11 +303,11 @@ class Uno {
   }
 
   printServerState () {
-    let handNum = padRight(this.players.reduce((s, p) => s + p.cards.length, 0), 3)
-    let deckNum = padRight(this.deck.deck.length, 3)
-    let discardsNum = padRight(this.deck.discards.length, 3)
-    let penaltyNum = padRight(this.deck.penalties.length, 3)
-    let sum = padRight(parseInt(handNum) + parseInt(deckNum) + parseInt(discardsNum) + parseInt(penaltyNum), 3)
+    let handNum = padLeft(this.players.reduce((s, p) => s + p.cards.length, 0), 3)
+    let deckNum = padLeft(this.deck.deck.length, 3)
+    let discardsNum = padLeft(this.deck.discards.length, 3)
+    let penaltyNum = padLeft(this.deck.penalties.length, 3)
+    let sum = padLeft(parseInt(handNum) + parseInt(deckNum) + parseInt(discardsNum) + parseInt(penaltyNum), 3)
 
     let d4 = this.state.d4 ? 'true ' : 'false'
     let d2 = this.state.d2 ? 'true ' : 'false'
@@ -317,12 +318,28 @@ class Uno {
     console.log(`Server[${handNum}][${deckNum}][${discardsNum}][${penaltyNum}][${sum}]: State[Color: ${color}, Symbol: ${symbol}, +4: ${d4}, +2: ${d2} ] Action[${action}]`)
   }
 
-  printPlayerDeal (playerIndex, cards) {
+  printPlayerDeal (cards) {
     let card = cards[0]
-    let player = this.players[playerIndex]
-    let handNum = padRight(player.cards.length, 3)
-    let head = padLeft(`Player(${playerIndex})  [${handNum}]`, 31)
-    console.log(`${head}: ${card.toString()} * ${cards.length}`)
+    let turn = padLeft(this.turns, 3)
+    let player = this.players[this.pointer]
+    let handNum = padLeft(player.cards.length, 3)
+    let head = padLeft(`[${turn}]Player(${this.pointer})  [${handNum}]`, 31)
+    let handCards = player.cards.reduce((s, c) => `${s + c.toShortenString()}, `, '')
+    console.log(`${head}: ${card.toString()} * ${cards.length} [${handCards}]`)
+  }
+
+  printResult () {
+    console.log('--------RESULT--------')
+
+    this.players.forEach((p, i) => {
+      if (p.cards.length === 0) {
+        console.log(`Player(${i}): Winner`)
+      } else {
+        let score = padRight(p.cards.reduce((s, c) => s + c.getScore(), 0), 3)
+        let cards = p.cards.reduce((s, c) => `${s + c.toShortenString()}, `, '')
+        console.log(`Player(${i}): ${score} ${cards}`)
+      }
+    })
   }
 
   movePointer () {
@@ -351,20 +368,25 @@ class Uno {
   }
 
   loop () {
-    while (this.state.action !== 'end' && this.turns < 100) {
-      this.printServerState()
+    while (this.state.action !== 'end' && this.turns < 1000) {
+      // this.printServerState()
 
-      let playerDeals = this.players[this.pointer].move(
+      let currentPlayer = this.players[this.pointer]
+      let playerDeals = currentPlayer.move(
         this.state,
         this.deck.penalties
       )
 
-      this.printPlayerDeal(this.pointer, playerDeals)
+      this.printPlayerDeal(playerDeals)
 
-      this.pushState(playerDeals)
-
-      this.currentCard = playerDeals[0]
-      this.turns++
+      if (currentPlayer.cards.length === 0) {
+        this.state.action = 'end'
+        this.printResult()
+      } else {
+        this.pushState(playerDeals)
+        this.currentCard = playerDeals[0]
+        this.turns++
+      }
     }
   }
 
@@ -391,6 +413,7 @@ class Uno {
       case 'clr':
         this.state.action = 'onturn'
         this.state.color = card.color
+        this.state.symbol = card.symbol
         this.movePointer()
         break
       case 'C':
