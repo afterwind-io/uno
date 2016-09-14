@@ -9,12 +9,17 @@ class Card {
 
   // 用于标识弃权（无牌可出/故意放弃 => 罚摸）
   static pass () {
-    return new Card('X', 'X', 'X')
+    return new Card('', 'pass', '')
   }
 
   // 用于标识被跳过（上家出禁牌）
   static skip () {
-    return new Card()
+    return new Card('', 'skip', '')
+  }
+
+  // 用于标志换色（响应换色牌）
+  static color (color) {
+    return new Card(color, 'color', '')
   }
 }
 
@@ -22,6 +27,7 @@ class Deck {
   constructor () {
     this.deck = []
     this.discards = []
+    this.NUM_HAND = 7
   }
 
   gen () {
@@ -43,6 +49,12 @@ class Deck {
         this.deck.push(new Card('', w, true))
       })
     })
+  }
+
+  deal (playerNumber) {
+    return [].fill(0, 0, playerNumber).map(
+      p => this.deck.splice(0, this.NUM_HAND)
+    )
   }
 
   pickFirst () {
@@ -76,9 +88,6 @@ class Deck {
       return true
     }
   }
-  callColor (color) {
-    this.currentState.color = color
-  }
 
   static shuffle (deck) {
     var cache = deck.map(c => c)
@@ -107,8 +116,13 @@ class Player {
     this.cards = cards
   }
 
-  move (action, state, penalties) {
+  move (state, action, penalties) {
     return Promise.resolve()
+  }
+
+  callColor (color) {
+    // TODO:
+    // this.currentState.color = color
   }
 }
 
@@ -118,7 +132,9 @@ class Uno {
     this.players = players
     this.currentState = {
       color: '',
-      symbol: ''
+      symbol: '',
+      d2: false,
+      d4: false
     }
     this.currentCard = {}
     this.currentAction = ''
@@ -127,27 +143,49 @@ class Uno {
     this.penalty = 1
   }
 
-  init () {
+  start () {
+    this.initDeck()
+    this.initState()
+    this.deal()
+
+    this.currentAction = 'onturn'
+    this.loop()
+  }
+
+  initDeck () {
     this.deck.gen()
+  }
+
+  initState () {
     this.currentCard = this.deck.pickFirst()
     this.currentState.color = this.currentCard.color
     this.currentState.symbol = this.currentCard.symbol
+  }
 
-    this.currentAction = 'onturn'
-    this.next()
+  deal () {
+    this.deck.deal(this.players.length)
+             .forEach((p, i) => { this.players[i].init(p) })
+  }
+
+  printServerState () {
+    let d4 = this.currentState.d4
+    let d2 = this.currentState.d2
+    let color = this.currentState.color
+    let symbol = this.currentState.symbol
+
+    console.log(`Server  : State[ +4: ${d4}, +2: ${d2}, color: ${color}, symbol: ${symbol} ] Action[${this.currentAction}]`)
   }
 
   loop () {
-    while (true) {
+    while (this.currentAction !== 'end') {
+      this.printServerState()
 
+      let playerCard = this.players[this.pointer].move(
+        this.currentState,
+        this.currentAction,
+        this.penalties
+      )
     }
-  }
-
-  next () {
-    this.players[this.pointer].move(
-      this.currentAction,
-      this.currentState
-    )
   }
 }
 
@@ -171,3 +209,5 @@ class Uno {
  * 主机  牌（绿，转，否） 状（绿，禁） => 'onturn', pointer-1
  * 玩家5
  */
+
+export default new Uno()
