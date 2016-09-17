@@ -1,3 +1,4 @@
 export default {
-  player: {}
+  player: {},
+  room: {}
 }

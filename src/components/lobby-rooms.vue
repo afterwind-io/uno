@@ -1,12 +1,12 @@
 <template>
   <div class="Component">
-    <h2>Online Players: {{players.length}}</h2>
-    <div class="playersContainer">
-      <input type="text" placeholder="搜索玩家" v-model="search">
+    <h2>Rooms: {{rooms.length}}</h2>
+    <div class="roomContainer">
+      <input type="text" placeholder="搜索房间" v-model="search">
+      <input type="button" value="创建..." @click="create">
       <input type="button" value="刷新列表" @click="refresh">
-      <div class="playerBox" v-for="player in players">
-        <p>{{player.name}}</p>
-        <p>{{player.status}}</p>
+      <div class="roomBox" v-for="room in rooms" @click="enter(room)">
+        <p>{{room.id}}: {{room.name}} {{room.players.length}}/{{room.limit}} {{room.status}}</p>
       </div>
     </div>
   </div>
@@ -18,16 +18,16 @@ import api from '../services/api.js'
 import ws from '../services/websocket.js'
 
 let _data = {
-  players: [],
+  rooms: [],
   search: ''
 }
 let _setValue = Vue.set.bind(null, _data)
 
 let _refresh = function(){
-  api.getOnlinePlayers(
+  api.getRooms(
     {},
     res => {
-      _setValue('players', res.players)
+      _setValue('rooms', res.rooms)
     }
   )
 }
@@ -42,14 +42,20 @@ let _socket = ws.register (res => {
   }
 })
 
+
 export default {
-  data () {
+  data() {
     return _data
   },
+  computed: {},
   methods: {
+    enter (room) {},
+    create () {
+      this.$emit('show-pop-crt-room')
+    },
     refresh: _refresh
-  }
-}
+  },
+};
 </script>
 
 <style lang="css">

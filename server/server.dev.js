@@ -10,6 +10,7 @@ let WebpackDevServer = require('webpack-dev-server')
 let server = new WebpackDevServer(compiler, {
   inline: true,
   hot: true,
+  noInfo: true,
   stats: { colors: true },
   setup: function (app) {
     app.use(express.static(path.dirname(__dirname)))

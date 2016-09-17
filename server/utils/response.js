@@ -1,9 +1,10 @@
 module.exports = {
-  reply: function (info, res) {
-    if (info.code === -1) {
-      res.status(500).json(info.msg)
+  reply: function (code, content, res) {
+    if (code === -1) {
+      console.log(content)
+      res.status(500).json(`${content.name}: ${content.message} ${content.stack}`)
     } else {
-      res.json(info.msg)
+      res.json(content)
     }
   }
 }

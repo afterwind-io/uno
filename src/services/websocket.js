@@ -17,10 +17,10 @@ export default {
       _socket = ws(wsServerUrl)
     }
   },
-  login () {
+  login (params) {
     if (typeof _socket === 'undefined') return
 
-    _emit({ title: 'login', content: '' })
+    _emit({ title: 'login', content: params})
   },
   logout () {
     if (typeof _socket === 'undefined') return

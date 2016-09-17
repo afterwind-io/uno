@@ -1,10 +1,10 @@
 module.exports = {
-  gen (g) {
+  flow (g) {
     var generator = g()
 
     function handle (result) {
       // result => { done: [Boolean], value: [Object] }
-      if (result.done) return Promise.resolve(result.value)
+      if (result.done) return result.value
 
       return Promise.resolve(result.value).then(function (res) {
         return handle(generator.next(res))

@@ -36,9 +36,8 @@ export default {
       api.register(
         {username: this.user.name, password: ''},
         (res) => {
-          ws.login()
-          shared.player.name = this.user.name
-          shared.player.status = 0
+          ws.login({pid: res._pid})
+          shared.player = res.player
           nav.go('lobby')
         }
       )
@@ -47,9 +46,8 @@ export default {
       api.login(
         {username: this.user.name, password: ''},
         (res) => {
-          ws.login()
-          shared.player.name = this.user.name
-          shared.player.status = 0
+          ws.login({pid: res._pid})
+          shared.player = res.player
           nav.go('lobby')
         }
       )

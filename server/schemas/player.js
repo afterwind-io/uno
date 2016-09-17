@@ -1,15 +1,22 @@
-let gen = require('../utils/async.js').gen
+let flow = require('../utils/async.js').flow
 
 let mongoose = require('mongoose')
 let Schema = mongoose.Schema
 const playerStatus = {
   offline: -1,
-  idle: 0,
-  ready: 1,
-  ingame: 2
+  online: 0
+}
+
+function idGen () {
+  return Array(8).fill(0).reduce((s, c) => {
+    let r = Math.floor(Math.random() * 36)
+    r += r < 10 ? 48 : 87
+    return s + String.fromCharCode(r)
+  }, '')
 }
 
 let playerSchema = new Schema({
+  _uid: String,
   name: String,
   password: String,
   status: { type: Number, default: -1 }
@@ -21,30 +28,29 @@ let playerSchema = new Schema({
  * @param   {Function}  callback  回调函数
  */
 playerSchema.statics.register = function (
-  { username, password, session }, callback
+  { username, password, session }
 ) {
-  let model = this
+  return flow(function* () {
+    let player = yield model.findOne({ name: username }).exec()
 
-  model.findOne({ name: username }, function (err, p) {
-    if (err) {
-      return console.log(err)
+    if (player !== null) {
+      throw new Error('该用户已注册')
     }
-    if (p === null) {
-      model.create({
-        name: username,
-        password: password,
-        status: playerStatus.idle
-      }, function (err, n) {
-        if (err) {
-          return console.log(err)
-        }
 
-        session.username = username
+    let data = yield model.create({
+      _uid: idGen(),
+      name: username,
+      password: password,
+      status: playerStatus.online,
+      roomId: 0
+    })
 
-        callback({code: 0, msg: '注册成功'})
-      })
-    } else {
-      callback({code: -1, msg: '该用户已注册'})
+    session.username = username
+
+    return {
+      _uid: data._uid,
+      name: data.name,
+      status: data.status
     }
   })
 }
@@ -52,86 +58,70 @@ playerSchema.statics.register = function (
 /**
  * 登陆
  * @param   {object}    info      参数包
- * @param   {Function}  callback  回调函数
  */
 playerSchema.statics.login = function (
-  { username, password, session }, callback
+  { username, password, session }
 ) {
-  this.findOne({ name: username }, function (err, p) {
-    if (err) {
-      return console.log(err)
+  return flow(function* () {
+    let player = yield model.findOne({ name: username }).exec()
+
+    if (player === null) {
+      throw new Error('该用户不存在')
     }
-    if (p === null) {
-      return callback({code: -1, msg: '该用户不存在'})
-    }
-    // if (p.status !== playerStatus.offline) {
-    //   return callback({code: -1, msg: '该用户已登录'})
-    // }
-    if (p.password !== password) {
-      return callback({code: -1, msg: '密码错误'})
+    if (player.password !== password) {
+      throw new Error('密码错误')
     }
 
-    p.status = playerStatus.idle
+    player.status = playerStatus.online
+    let data = yield player.save()
+
     session.username = username
 
-    p.save(function (err) {
-      if (err) return console.log(err)
-
-      return callback({code: 0, msg: '登陆成功'})
-    })
+    return {
+      _uid: data._uid,
+      name: data.name,
+      status: data.status
+    }
   })
 }
 
 /**
  * 登出
  * @param   {object}    info      参数包
- * @param   {Function}  callback  回调函数
  */
-playerSchema.statics.logout = function (
-  { session }, callback
-) {
-  let username = session.username
+playerSchema.statics.logout = function ({ session }) {
+  return flow(function* () {
+    let username = session.username
+    let player = yield model.findOne({ name: username }).exec()
 
-  this.findOne({name: username}, function (err, p) {
-    if (err) {
-      return console.log(err)
+    if (player === null) {
+      throw new Error('该用户不存在')
     }
-    if (p === null) {
-      return callback({code: -1, msg: '该用户不存在'})
-    }
-    if (p.status === playerStatus.offline) {
-      return callback({code: -1, msg: '该用户已登出'})
+    if (player.status === playerStatus.offline) {
+      throw new Error('该用户已登出')
     }
 
-    p.status = playerStatus.offline
-    // session.username = ''
+    player.status = playerStatus.offline
 
-    p.save(function (err) {
-      if (err) return console.log(err)
-
-      return callback({code: 0, msg: '登出成功'})
-    })
+    yield player.update({ status: playerStatus.offline }).exec()
+    return player._uid
   })
 }
 
 /**
  * 获取服务器当前所有在线玩家
- * @param   {Function}  callback  回调函数
  */
-playerSchema.statics.getOnlinePlayers = function (callback) {
-  let model = this
-
-  gen(function* () {
-    try {
-      let players = yield model
-        .find({status: playerStatus.idle})
-        .exec()
-
-      yield callback({code: 0, msg: players})
-    } catch (e) {
-      return console.log(e)
-    }
+playerSchema.statics.getOnlinePlayers = function () {
+  return flow(function* () {
+    let players = yield model.find({ status: playerStatus.online }).exec()
+    return players.map(p => {
+      return {
+        name: p.name,
+        status: p.status
+      }
+    })
   })
 }
 
-module.exports = mongoose.model('Player', playerSchema)
+let model = mongoose.model('Player', playerSchema)
+module.exports = model
