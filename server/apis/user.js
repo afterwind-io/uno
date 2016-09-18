@@ -17,7 +17,7 @@ router.post('/register', function (req, res) {
       })
 
       let player = yield redisPlayer.create(playerInfo)
-      yield redisRoom.welcome(player)
+      yield redisRoom.addPlayer(0, player._gid)
 
       response.reply(0, { player }, res)
     } catch (e) {
@@ -36,7 +36,7 @@ router.post('/login', function (req, res) {
       })
 
       let player = yield redisPlayer.create(playerInfo)
-      yield redisRoom.welcome(player)
+      yield redisRoom.addPlayer(0, player._gid)
 
       response.reply(0, { player }, res)
     } catch (e) {
@@ -49,8 +49,8 @@ router.post('/logout', function (req, res) {
   flow(function* () {
     try {
       let playerUid = yield playerSchema.logout({ session: req.session })
-      let info = yield redisPlayer.clear(playerUid)
-      redisRoom.removePlayer(info)
+      let player = yield redisPlayer.clear(playerUid)
+      redisRoom.removePlayer(player.roomId, player._gid)
       response.reply(0, {}, res)
     } catch (e) {
       response.reply(-1, e, res)
@@ -61,7 +61,7 @@ router.post('/logout', function (req, res) {
 router.post('/getOnlinePlayers', function (req, res) {
   flow(function* () {
     try {
-      let players = yield playerSchema.getOnlinePlayers()
+      let players = yield redisPlayer.getAllPlayers()
       response.reply(0, { players }, res)
     } catch (e) {
       response.reply(-1, e, res)

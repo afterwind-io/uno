@@ -48,15 +48,19 @@ class Room {
     return this.players
   }
 
-  get CurrentPlayersNum () {
+  get currentPlayersNum () {
     return this.players.length
   }
 
   addPlayer (id) {
+    console.log(`[room]Entering Player:${id} to Room:${this.id}`)
+
     if (this.players.length + 1 <= this.limit) this.players.push(id)
   }
 
   removePlayer (id) {
+    console.log(`[room]Removing Player:${id} from Room:${this.id}`)
+
     let i = this.players.indexOf(id)
     if (i !== -1) this.players.splice(i, 1)
   }
@@ -96,15 +100,6 @@ redis.set('idGen', 0)
 redis.set(LOBBY_ID, (new Room({id: LOBBY_ID, name: 'Lobby'})).toString())
 
 module.exports = {
-  welcome (player) {
-    return flow(function* () {
-      let s = yield redis.get(LOBBY_ID)
-      let lobby = Room.parse(s)
-      lobby.addPlayer(player.gameId)
-      yield redis.set(LOBBY_ID, lobby.toString())
-      return LOBBY_ID
-    })
-  },
   create (info) {
     return flow(function* () {
       let id = yield redis.incr('idGen')
@@ -116,6 +111,11 @@ module.exports = {
       })
       yield redis.set(id.toString(), room.toString())
       return room
+    })
+  },
+  clear (id) {
+    return flow(function* () {
+      return redis.del(id)
     })
   },
   addPlayer (roomId, gameId) {
@@ -140,8 +140,7 @@ module.exports = {
       let keys = yield redis.keys('[0-9]*')
       let rooms = yield redis.mget(keys)
       return rooms.map(r => {
-        let room = Room.parse(r)
-        return room.toPackage()
+        return Room.parse(r)
       })
     })
   },
@@ -151,8 +150,7 @@ module.exports = {
       if (s === 'nil') {
         throw new Error('指定的房间不存在')
       }
-      let room = Room.parse(s)
-      return room.toPackage()
+      return Room.parse(s)
     })
   }
 }

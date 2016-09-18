@@ -9,7 +9,8 @@ let response = require('../utils/response.js')
 router.post('/getAll', (req, res) => {
   flow(function* () {
     try {
-      let rooms = yield redisRoom.getRooms()
+      let roomsRds = yield redisRoom.getRooms()
+      let rooms = roomsRds.map(r => r.toPackage())
       response.reply(0, { rooms }, res)
     } catch (e) {
       response.reply(-1, e, res)
@@ -20,7 +21,8 @@ router.post('/getAll', (req, res) => {
 router.post('/create', (req, res) => {
   flow(function* () {
     try {
-      let room = yield redisRoom.create(req.body)
+      let roomsRds = yield redisRoom.create(req.body)
+      let room = roomsRds.toPackage()
       response.reply(0, { room }, res)
     } catch (e) {
       response.reply(-1, e, res)
@@ -35,11 +37,12 @@ router.post('/join', (req, res) => {
       yield redisRoom.removePlayer(oldRoomId, req.body.gid)
       yield redisRoom.addPlayer(req.body.roomId, req.body.gid)
 
-      let room = yield redisRoom.getRoom(req.body.roomId)
-      let players = yield redisPlayer.getPlayers(room.players)
-      room.players = room.players.map(gid => {
-        return players.find(p => p.gid === gid)
+      let roomsRds = yield redisRoom.getRoom(req.body.roomId)
+      let players = yield redisPlayer.getPlayers(roomsRds.players)
+      roomsRds.players = roomsRds.players.map(gid => {
+        return players.find(p => p._gid === gid)
       })
+      let room = roomsRds.toPackage()
 
       response.reply(0, { room }, res)
     } catch (e) {
@@ -55,7 +58,11 @@ router.post('/leave', (req, res) => {
       yield redisRoom.removePlayer(oldRoomId, req.body.gid)
       yield redisRoom.addPlayer(0, req.body.gid)
 
-      // let room = yield redisRoom.getRoom(0)
+      let roomRds = yield redisRoom.getRoom(oldRoomId)
+      if (roomRds.currentPlayersNum === 0) {
+        redisRoom.clear(oldRoomId)
+      }
+
       response.reply(0, {}, res)
     } catch (e) {
       response.reply(-1, e, res)

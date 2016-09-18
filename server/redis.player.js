@@ -20,7 +20,7 @@ class Player {
     this._gid = `${this._pid}:${this._uid}`
     this.name = info.name
     this.status = info.status || playerStatus.idle
-    this.roomId = 0
+    this.roomId = info.roomId || 0
   }
 
   toString () {
@@ -60,6 +60,16 @@ module.exports = {
       return s.map(p => {
         let player = Player.parse(p)
         return player
+      })
+    })
+  },
+  getAllPlayers () {
+    return flow(function* () {
+      // FIXME:
+      let keys = yield redis.keys('[0-9]*')
+      let players = yield redis.mget(keys)
+      return players.map(p => {
+        return Player.parse(p)
       })
     })
   },

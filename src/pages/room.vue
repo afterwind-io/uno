@@ -24,7 +24,14 @@ export default {
   data() {
     return _data
   },
-  computed: {},
+  computed: {
+    roomName () {
+      return shared.room.name
+    },
+    players () {
+      return shared.room.players
+    }
+  },
   methods: {
     ready () {
 

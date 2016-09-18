@@ -5,8 +5,7 @@
       <input type="text" placeholder="搜索玩家" v-model="search">
       <input type="button" value="刷新列表" @click="refresh">
       <div class="playerBox" v-for="player in players">
-        <p>{{player.name}}</p>
-        <p>{{player.status}}</p>
+        <p>{{player.name}} Room:{{player.roomId}} Status:{{player.status}}</p>
       </div>
     </div>
   </div>
