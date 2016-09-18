@@ -1,12 +1,9 @@
 <template>
   <div class="mainFrame">
-    <h1>UNO Online</h1>
-    <h3>Mini Version</h3>
-    <p>Player Name:</p>
-    <input type="text" v-model="user.name">
-    <input type="button" @click="register" value="Register">
-    <input type="button" @click="login" value="Login">
-    <a :href="page.about">About!</a>
+    <h1>Home</h1>
+    <input type="button" @click="logout" value="退出">
+    <router-view></router-view>
+    <chat></chat>
   </div>
 </template>
 
@@ -14,47 +11,30 @@
 import api from '../services/api.js'
 import ws from '../services/websocket.js'
 import nav from '../services/navigation.js'
-import shared from '../services/shared.js'
+import ui_chat from '../components/chat.vue'
 
-ws.init()
 
 export default {
-  data () {
+  data() {
     return {
-      user: {
-        name: 'Doge'
-      },
-      page: {
-        main: '#/main',
-        lobby: '#/lobby',
-        about: '#/about'
-      }
     };
   },
+  computed: {},
   methods: {
-    register () {
-      api.register(
-        {username: this.user.name, password: ''},
+    logout () {
+      api.logout({},
         (res) => {
-          ws.login({pid: res._pid})
-          shared.player = res.player
-          nav.go('lobby')
+          ws.logout()
+          nav.go('landing')
         }
       )
     },
-    login () {
-      api.login(
-        {username: this.user.name, password: ''},
-        (res) => {
-          ws.login({pid: res._pid})
-          shared.player = res.player
-          nav.go('lobby')
-        }
-      )
-    }
+  },
+  components: {
+    chat: ui_chat
   }
-}
+};
 </script>
 
-<style lang="less" scoped>
+<style lang="css">
 </style>
