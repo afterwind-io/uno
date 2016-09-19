@@ -24,7 +24,7 @@ let _setValue = Vue.set.bind(null, _data)
 
 let _refresh = function(){
   api.getOnlinePlayers(
-    {},
+    { rangeMin: 0, rangeMax: 50 },
     res => {
       _setValue('players', res.players)
     }

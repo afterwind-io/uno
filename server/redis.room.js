@@ -109,13 +109,15 @@ module.exports = {
         isPublic: info.isPublic,
         password: info.password
       })
-      yield redis.set(id.toString(), room.toString())
+      yield redis.set(id, room.toString())
+      yield redis.lpush('rooms', id)
       return room
     })
   },
   clear (id) {
     return flow(function* () {
-      return redis.del(id)
+      yield redis.del(id)
+      return redis.lrem('rooms', 0, id)
     })
   },
   addPlayer (roomId, gameId) {
@@ -134,14 +136,23 @@ module.exports = {
       return redis.set(roomId, room.toString())
     })
   },
-  getRooms () {
+  getRooms (rangeMin, rangeMax) {
     return flow(function* () {
-      // FIXME:
-      let keys = yield redis.keys('[0-9]*')
-      let rooms = yield redis.mget(keys)
-      return rooms.map(r => {
-        return Room.parse(r)
-      })
+      if (rangeMin < 0 || rangeMax < 0) {
+        throw new Error(`取值范围无效。rangeMax:${rangeMax}, rangeMin:${rangeMin}`)
+      }
+
+      // 始终优先获取最新创建的房间
+      let keys = yield redis.lrange('rooms', -rangeMax - 1, -rangeMin - 1)
+
+      if (keys.length === 0) {
+        return []
+      } else {
+        let rooms = yield redis.mget(keys)
+        return rooms.map(r => {
+          return Room.parse(r)
+        })
+      }
     })
   },
   getRoom (key) {

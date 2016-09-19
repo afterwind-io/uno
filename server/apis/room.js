@@ -9,7 +9,7 @@ let response = require('../utils/response.js')
 router.post('/getAll', (req, res) => {
   flow(function* () {
     try {
-      let roomsRds = yield redisRoom.getRooms()
+      let roomsRds = yield redisRoom.getRooms(req.body.rangeMin, req.body.rangeMax)
       let rooms = roomsRds.map(r => r.toPackage())
       response.reply(0, { rooms }, res)
     } catch (e) {
@@ -59,7 +59,7 @@ router.post('/leave', (req, res) => {
       yield redisRoom.addPlayer(0, req.body.gid)
 
       let roomRds = yield redisRoom.getRoom(oldRoomId)
-      if (roomRds.currentPlayersNum === 0) {
+      if (roomRds.id !== 0 && roomRds.currentPlayersNum === 0) {
         redisRoom.clear(oldRoomId)
       }
 

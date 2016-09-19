@@ -50,7 +50,13 @@ router.post('/logout', function (req, res) {
     try {
       let playerUid = yield playerSchema.logout({ session: req.session })
       let player = yield redisPlayer.clear(playerUid)
-      redisRoom.removePlayer(player.roomId, player._gid)
+      yield redisRoom.removePlayer(player.roomId, player._gid)
+
+      let roomRds = yield redisRoom.getRoom(player.roomId)
+      if (roomRds.id !== 0 && roomRds.currentPlayersNum === 0) {
+        redisRoom.clear(player.roomId)
+      }
+
       response.reply(0, {}, res)
     } catch (e) {
       response.reply(-1, e, res)
@@ -61,7 +67,7 @@ router.post('/logout', function (req, res) {
 router.post('/getOnlinePlayers', function (req, res) {
   flow(function* () {
     try {
-      let players = yield redisPlayer.getAllPlayers()
+      let players = yield redisPlayer.getAllPlayers(req.body.rangeMin, req.body.rangeMax)
       response.reply(0, { players }, res)
     } catch (e) {
       response.reply(-1, e, res)

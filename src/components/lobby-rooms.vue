@@ -28,7 +28,7 @@ let _setValue = Vue.set.bind(null, _data)
 
 let _refresh = function(){
   api.getRooms(
-    {},
+    { rangeMin: 0, rangeMax: 50 },
     res => {
       _setValue('rooms', res.rooms)
     }
