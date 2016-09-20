@@ -57,6 +57,10 @@ const eventHandler = {
     let channel = getChannel(type, id)
     socket.join(channel)
   },
+  leave (socket, { type, id }) {
+    let channel = getChannel(type, id)
+    socket.leave(channel)
+  },
   pm (socket, { gid, msg }) {
     emitPrivateMessage(gid, msg)
   }

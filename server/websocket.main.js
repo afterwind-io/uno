@@ -26,4 +26,8 @@ io.on('connection', socket => {
         break
     }
   })
+
+  socket.on('disconnect', () => {
+    debug('A client has disconnected.')
+  })
 })
