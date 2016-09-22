@@ -22,18 +22,6 @@ function emitPrivateMessage (gid, msg) {
   })
 }
 
-io.on('connection', socket => {
-  socket.on('chat', msg => {
-    debug(`<= ${JSON.stringify(msg)}`)
-
-    let event = msg.title
-    let params = msg.content
-    if (eventHandler.hasOwnProperty(event)) {
-      eventHandler[event](socket, params)
-    }
-  })
-})
-
 const eventHandler = {
   login (socket, { gid }) {
     // 默认加入属于自己的私聊频道
