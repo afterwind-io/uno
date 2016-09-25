@@ -1,6 +1,5 @@
-import io from './server.ws.js'
-
-let debug = console.log.bind(null, '[WebSocket](chat)')
+let io
+const debug = console.log.bind(null, '[WebSocket](chat)')
 
 function getChannel (type, gid) {
   return `${type}:${gid}`

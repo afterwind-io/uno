@@ -1,5 +1,3 @@
-import io from './server.ws.js'
-
 let debug = console.log.bind(null, '[WebSocket](server)')
 
 function emitOnlineStatus () {
