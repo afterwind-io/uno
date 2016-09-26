@@ -1,21 +1,17 @@
-var env = process.env.NODE_ENV || 'dev'
-// var db = require('./server/server.db.js')
-var ws = require('./server/server.ws.js')
+const main = require('./server/entry/main/index.js')
+// const ws = require('./server/entry/websocket/index.js')
+const dist = require('./server/entry/public/index.js')
 
-var srv
-switch (env) {
-  case 'dev':
-    srv = require('./server/server.dev.js')
-    break
-  case 'prod':
-    srv = require('./server/server.html.js')
-    break
-  default:
-    throw new Error('No such environment! <' + env + '>')
-}
+const serviceLTS = require('./server/services/lts/index.js')
+const serviceAuth = require('./server/services/auth/index.js')
+const servicePlayer = require('./server/services/player/index.js')
+const serviceRoom = require('./server/services/room/index.js')
 
-var routes = require('./server/routes.js')
+serviceLTS.start()
+serviceAuth.start()
+servicePlayer.start()
+serviceRoom.start()
 
-// db.start('27017')
-ws.start('3001')
-srv.start('3000')
+main.start()
+// ws.start()
+dist.start()
