@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const redisRoom = require('./redis.room.js')
 
-router.post('create', (req, res) => {
+router.post('/create', (req, res) => {
   flow(function* () {
     try {
       let result = redisRoom.create(req.body.info)
@@ -15,7 +15,7 @@ router.post('create', (req, res) => {
   })
 })
 
-router.post('remove', (req, res) => {
+router.post('/remove', (req, res) => {
   flow(function* () {
     try {
       let result = redisRoom.remove(req.body.info)
@@ -26,7 +26,7 @@ router.post('remove', (req, res) => {
   })
 })
 
-router.post('addPlayer', (req, res) => {
+router.post('/addPlayer', (req, res) => {
   flow(function* () {
     try {
       let result = redisRoom.addPlayer(req.body.info)
@@ -37,7 +37,7 @@ router.post('addPlayer', (req, res) => {
   })
 })
 
-router.post('removePlayer', (req, res) => {
+router.post('/removePlayer', (req, res) => {
   flow(function* () {
     try {
       let result = redisRoom.removePlayer(req.body.info)
@@ -48,7 +48,7 @@ router.post('removePlayer', (req, res) => {
   })
 })
 
-router.post('getRooms', (req, res) => {
+router.post('/getRooms', (req, res) => {
   flow(function* () {
     try {
       let result = redisRoom.getRooms(req.body.info)
@@ -59,7 +59,7 @@ router.post('getRooms', (req, res) => {
   })
 })
 
-router.post('getRoom', (req, res) => {
+router.post('/getRoom', (req, res) => {
   flow(function* () {
     try {
       let result = redisRoom.getRoom(req.body.info)

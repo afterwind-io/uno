@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const redisPlayer = require('./redis.player.js')
 
-router.post('create', (req, res) => {
+router.post('/create', (req, res) => {
   flow(function* () {
     try {
       let result = yield redisPlayer.create(req.body.info)
@@ -15,7 +15,7 @@ router.post('create', (req, res) => {
   })
 })
 
-router.post('clear', (req, res) => {
+router.post('/clear', (req, res) => {
   flow(function* () {
     try {
       let result = yield redisPlayer.clear(req.body.info.uids)
@@ -26,7 +26,7 @@ router.post('clear', (req, res) => {
   })
 })
 
-router.post('getPlayers', (req, res) => {
+router.post('/getPlayers', (req, res) => {
   flow(function* () {
     try {
       let result = yield redisPlayer.getPlayers(req.body.info.gids)
@@ -37,7 +37,7 @@ router.post('getPlayers', (req, res) => {
   })
 })
 
-router.post('getAllPlayers', (req, res) => {
+router.post('/getAllPlayers', (req, res) => {
   flow(function* () {
     try {
       let result = yield redisPlayer.getAllPlayers(
@@ -50,7 +50,7 @@ router.post('getAllPlayers', (req, res) => {
   })
 })
 
-router.post('changeRoom', (req, res) => {
+router.post('/changeRoom', (req, res) => {
   flow(function* () {
     try {
       let result = yield redisPlayer.changeRoom(

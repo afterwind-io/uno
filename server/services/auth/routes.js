@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const redisAuth = require('./redis.auth.js')
 
-router.post('add', (req, res) => {
+router.post('/add', (req, res) => {
   flow(function* () {
     try {
       let result = yield redisAuth.add(req.body.info)
@@ -15,7 +15,7 @@ router.post('add', (req, res) => {
   })
 })
 
-router.post('remove', (res, req) => {
+router.post('/remove', (req, res) => {
   flow(function* () {
     try {
       let result = yield redisAuth.remove(req.body.info)
@@ -26,7 +26,7 @@ router.post('remove', (res, req) => {
   })
 })
 
-router.post('check', (res, req) => {
+router.post('/check', (req, res) => {
   flow(function* () {
     try {
       let result = yield redisAuth.check(req.body.info)

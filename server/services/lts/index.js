@@ -3,10 +3,12 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+const logger = require('../../middlewares/logger.js')('Main')
 const routes = require('./routes.js')
 const ports = require('../../config.js').ports
 
 app.use(bodyParser.json())
+app.use(logger)
 app.use('/service/user', routes)
 
 module.exports = {

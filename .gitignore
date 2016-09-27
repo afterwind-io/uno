@@ -4,3 +4,4 @@ mongo/
 redis/
 node_modules/
 robomongo-0.9.0-rc10/
+npm-debug.log

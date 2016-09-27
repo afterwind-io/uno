@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const playerSchema = require('./schema.player.js')
 
-router.post('create', (req, res) => {
+router.post('/create', (req, res) => {
   flow(function* () {
     try {
       let player = yield playerSchema.create(req.body.info)
@@ -15,7 +15,7 @@ router.post('create', (req, res) => {
   })
 })
 
-router.post('get', (res, req) => {
+router.post('/get', (req, res) => {
   flow(function* () {
     try {
       let player = yield playerSchema.get(req.body.info)
@@ -26,7 +26,7 @@ router.post('get', (res, req) => {
   })
 })
 
-router.post('update', (res, req) => {
+router.post('/update', (req, res) => {
   flow(function* () {
     try {
       let player = yield playerSchema.update(req.body.info)
