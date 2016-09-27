@@ -12,15 +12,10 @@ app.use('/service/user', routes)
 module.exports = {
   start () {
     let db = mongoose.connection
-    let portMongo = ports.mongo
     let portLts = ports.lts
 
     db.on('error', console.error.bind(console, 'connection error:'))
-    db.once('open', function () {
-      console.log(`[Service][LTS][DB]Starts on :${portMongo}`)
-    })
-
-    mongoose.connect('mongodb://localhost:' + portMongo + '/uno')
+    mongoose.createConnection('mongodb://localhost:27017/uno')
 
     app.listen(portLts, () => {
       console.log(`[Service][LTS][API]Starts on :${portLts}`)
