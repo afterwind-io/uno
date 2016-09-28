@@ -1,6 +1,6 @@
 const flow = require('../../utils/async.js').flow
 const idGen = require('../../utils/idGen.js')
-const mongoose = require('mongoose')
+const mongoose = require('mongoose').createConnection('mongodb://localhost:27017/uno')
 const Schema = mongoose.Schema
 
 const playerSchema = new Schema({

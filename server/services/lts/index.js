@@ -17,7 +17,6 @@ module.exports = {
     let portLts = ports.lts
 
     db.on('error', console.error.bind(console, 'connection error:'))
-    mongoose.createConnection('mongodb://localhost:27017/uno')
 
     app.listen(portLts, () => {
       console.log(`[Service][LTS][API]Starts on :${portLts}`)
