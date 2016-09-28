@@ -120,19 +120,19 @@ module.exports = {
       return redis.lrem('rooms', 0, id)
     })
   },
-  addPlayer (roomId, gameId) {
+  addPlayer ({roomId, gid}) {
     return flow(function* () {
       let s = yield redis.get(roomId)
       let room = Room.parse(s)
-      room.addPlayer(gameId)
+      room.addPlayer(gid)
       return redis.set(roomId, room.toString())
     })
   },
-  removePlayer (roomId, gameId) {
+  removePlayer ({roomId, gid}) {
     return flow(function* () {
       let s = yield redis.get(roomId)
       let room = Room.parse(s)
-      room.removePlayer(gameId)
+      room.removePlayer(gid)
       return redis.set(roomId, room.toString())
     })
   },

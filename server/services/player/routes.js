@@ -7,7 +7,7 @@ const redisPlayer = require('./redis.player.js')
 router.post('/create', (req, res) => {
   flow(function* () {
     try {
-      let result = yield redisPlayer.create(req.body.info)
+      let result = yield redisPlayer.create(req.body)
       response.reply(0, { result }, res)
     } catch (e) {
       response.reply(-1, e, res)
@@ -18,7 +18,7 @@ router.post('/create', (req, res) => {
 router.post('/clear', (req, res) => {
   flow(function* () {
     try {
-      let result = yield redisPlayer.clear(req.body.info.uids)
+      let result = yield redisPlayer.clear(req.body.uids)
       response.reply(0, { result }, res)
     } catch (e) {
       response.reply(-1, e, res)
@@ -29,7 +29,7 @@ router.post('/clear', (req, res) => {
 router.post('/getPlayers', (req, res) => {
   flow(function* () {
     try {
-      let result = yield redisPlayer.getPlayers(req.body.info.gids)
+      let result = yield redisPlayer.getPlayers(req.body.gids)
       response.reply(0, { result }, res)
     } catch (e) {
       response.reply(-1, e, res)
@@ -54,7 +54,7 @@ router.post('/changeRoom', (req, res) => {
   flow(function* () {
     try {
       let result = yield redisPlayer.changeRoom(
-        req.body.info.gid, req.body.info.roomId
+        req.body.info.gid, req.body.roomId
       )
       response.reply(0, { result }, res)
     } catch (e) {

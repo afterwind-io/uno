@@ -15,10 +15,10 @@ const playerSchema = new Schema({
  * @param   {Function}  callback  回调函数
  */
 playerSchema.statics.create = function (
-  { username, password }
+  { name, password }
 ) {
   return flow(function* () {
-    let player = yield model.findOne({ name: username }).exec()
+    let player = yield model.findOne({ name }).exec()
 
     if (player !== null) {
       throw new Error('该用户已注册')
@@ -26,7 +26,7 @@ playerSchema.statics.create = function (
 
     let data = yield model.create({
       _uid: idGen(),
-      name: username,
+      name,
       password: password
     })
 
@@ -38,34 +38,34 @@ playerSchema.statics.create = function (
 }
 
 playerSchema.statics.get = function (
-  { username }
+  { name }
 ) {
   return flow(function* () {
-    let player = yield model.findOne({ name: username }).exec()
-
+    // TODO: 查询出错
+    let player = yield model.findOne({ name: name }).exec()
     if (player === null) {
       throw new Error('该用户不存在')
     }
 
     return {
       _uid: player._uid,
-      name: player.name
+      password: player.password
     }
   })
 }
 
 playerSchema.statics.update = function (
-  { username, password }
+  { name, password }
 ) {
   return flow(function* () {
-    let player = yield model.findOne({ name: username }).exec()
+    let player = yield model.findOne({ name }).exec()
 
     if (player === null) {
       throw new Error('该用户不存在')
     }
 
     yield player.update({
-      name: username,
+      name,
       password: password
     }).exec()
 
