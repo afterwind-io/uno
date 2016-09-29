@@ -1,12 +1,12 @@
 const mongoose = require('mongoose')
+const conn = mongoose.createConnection('mongodb://localhost:27017/uno')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
 
-mongoose.createConnection('mongodb://localhost:27017/uno')
+mongoose.Promise = global.Promise
 
-let db = mongoose.connection
-db.on('error', console.error.bind(console, 'connection error:'))
-db.once('open', function () {
+conn.on('error', console.error.bind(console, 'connection error:'))
+conn.once('open', function () {
   console.log('DataBase connected on *:' + 27017)
 })
 
@@ -15,7 +15,7 @@ module.exports = session({
   resave: false,
   saveUninitialized: false,
   store: new MongoStore({
-    mongooseConnection: db
+    mongooseConnection: conn
   }),
   cookie: {
     maxAge: 1000 * 3600 * 12

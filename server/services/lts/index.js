@@ -11,6 +11,8 @@ app.use(bodyParser.json())
 app.use(logger)
 app.use('/service/lts', routes)
 
+mongoose.Promise = global.Promise
+
 module.exports = {
   start () {
     let db = mongoose.connection

@@ -1,6 +1,7 @@
 const flow = require('../../utils/async.js').flow
 const idGen = require('../../utils/idGen.js')
-const mongoose = require('mongoose').createConnection('mongodb://localhost:27017/uno')
+const mongoose = require('mongoose')
+const conn = mongoose.createConnection('mongodb://localhost:27017/uno')
 const Schema = mongoose.Schema
 
 const playerSchema = new Schema({
@@ -75,5 +76,5 @@ playerSchema.statics.update = function (
   })
 }
 
-let model = mongoose.model('Player', playerSchema)
+let model = conn.model('Player', playerSchema)
 module.exports = model
