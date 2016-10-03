@@ -2,52 +2,119 @@ const flow = require('../../../utils/async.js').flow
 
 const express = require('express')
 const router = express.Router()
-const response = require('../../../utils/response.js')
+const reply = (require('../../../utils/response.js'))('user')
 
+const proxyAuth = (require('../proxy.js'))('auth')
 const proxyLTS = (require('../proxy.js'))('lts')
 const proxyPlayer = (require('../proxy.js'))('player')
 const proxyRoom = (require('../proxy.js'))('room')
 
-// router.post('/register', function (req, res) {
-//   flow(function* () {
-//     try {
-//       let playerInfo = yield playerSchema.register({
-//         username: req.body.username,
-//         password: req.body.password,
-//         session: req.session
-//       })
-//
-//       let player = yield redisPlayer.create(playerInfo)
-//       yield redisRoom.addPlayer(0, player._gid)
-//
-//       response.reply(0, { player }, res)
-//     } catch (e) {
-//       response.reply(-1, e, res)
-//     }
-//   })
-// })
+router.post('/register', (
+  { body, session }, res
+) => {
+  flow(function* () {
+    try {
+      let playerInfo = yield proxyLTS('create', {
+        name: body.name,
+        password: body.password
+      })
 
-router.post('/login', function (req, res) {
+      let player = yield proxyPlayer('create', playerInfo)
+      yield proxyRoom('addPlayer', {
+        roomId: 0,
+        uid: player.uid
+      })
+
+      yield proxyAuth('add', {
+        uid: player.uid
+      })
+      session.uid = player.uid
+
+      reply(0, { player }, res)
+    } catch (e) {
+      reply(-1, e, res)
+    }
+  })
+})
+
+router.post('/login', (
+  { body, session }, res
+) => {
   flow(function* () {
     try {
       let playerInfo = yield proxyLTS('get', {
-        name: req.body.username
+        name: body.name
       })
 
-      // if(playerInfo.password !== req.body.password){
-      //   throw new Error('用户名或密码不正确')
-      // }
+      if (playerInfo.password !== body.password) {
+        throw new Error('用户名或密码不正确')
+      }
 
-      let player = yield proxyPlayer('create', playerInfo)
+      let player = yield proxyPlayer('get', playerInfo)
+      if (!player.uid) player = yield proxyPlayer('create', playerInfo)
 
       yield proxyRoom('addPlayer', {
         roomId: 0,
-        gid: player._gid
+        uid: player.uid
       })
 
-      response.reply(0, { player }, res)
+      yield proxyAuth('add', {
+        uid: player.uid
+      })
+      session.uid = player.uid
+
+      reply(0, { player }, res)
     } catch (e) {
-      response.reply(-1, e, res)
+      reply(-1, e, res)
+    }
+  })
+})
+
+router.post('/logout', (
+  { session }, res
+) => {
+  flow(function* () {
+    try {
+      let uid = session.uid
+
+      let player = yield proxyPlayer('remove', { uid })
+      yield proxyRoom('remPlayer', {
+        roomId: player.roomId,
+        uid
+      })
+
+      if (player.roomId !== 0) {
+        let room = yield proxyRoom('get', {
+          roomId: player.roomId
+        })
+        if (room.players.length === 0) {
+          yield proxyRoom('remove', {
+            roomId: player.roomId
+          })
+        }
+      }
+
+      yield proxyAuth('remove', {
+        uid: player.uid
+      })
+      session.uid = ''
+
+      reply(0, {}, res)
+    } catch (e) {
+      reply(-1, e, res)
+    }
+  })
+})
+
+router.post('/getOnlinePlayers', (
+  { body }, res
+) => {
+  flow(function* () {
+    try {
+      let players = yield proxyPlayer('getAll', body)
+      reply(0, players, res)
+    } catch (e) {
+      reply(-1, e, res)
     }
   })
 })

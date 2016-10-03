@@ -38,7 +38,7 @@ export default {
     },
     leave () {
       api.leaveRoom({
-        gid: shared.player._gid,
+        uid: shared.player._uid,
         roomId: shared.room.id
       }, res => {
         shared.room = {}

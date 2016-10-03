@@ -5,7 +5,7 @@ const conn = mongoose.createConnection('mongodb://localhost:27017/uno')
 const Schema = mongoose.Schema
 
 const playerSchema = new Schema({
-  _uid: String,
+  uid: String,
   name: String,
   password: String
 })
@@ -15,66 +15,68 @@ const playerSchema = new Schema({
  * @param   {object}    info      参数包
  * @param   {Function}  callback  回调函数
  */
-playerSchema.statics.create = function (
+playerSchema.statics.create = (
   { name, password }
-) {
-  return flow(function* () {
-    let player = yield model.findOne({ name }).exec()
+) => flow(function* () {
+  let player = yield model.findOne({ name }).exec()
 
-    if (player !== null) {
-      throw new Error('该用户已注册')
-    }
+  if (player !== null) {
+    throw new Error('该用户已注册')
+  }
 
-    let data = yield model.create({
-      _uid: idGen(),
-      name,
-      password: password
-    })
+  let data = yield new model({
+    uid: idGen(),
+    name,
+    password
+  }).save()
 
-    return {
-      _uid: data._uid,
-      name: data.name
-    }
-  })
-}
+  // FIXME: bug with following code
+  // let data = yield model.create({
+  //   uid: idGen(),
+  //   name,
+  //   password
+  // })
 
-playerSchema.statics.get = function (
+  return {
+    uid: data.uid,
+    name: data.name,
+    password: data.password
+  }
+})
+
+playerSchema.statics.get = (
   { name }
-) {
-  return flow(function* () {
-    // TODO: 查询出错
-    let player = yield model.findOne({ name: name }).exec()
-    if (player === null) {
-      throw new Error('该用户不存在')
-    }
+) => flow(function* () {
+  let player = yield model.findOne({ name: name }).exec()
+  if (player === null) {
+    throw new Error('该用户不存在')
+  }
 
-    return {
-      _uid: player._uid,
-      password: player.password
-    }
-  })
-}
+  return {
+    uid: player.uid,
+    name: player.name,
+    password: player.password
+  }
+})
 
-playerSchema.statics.update = function (
+playerSchema.statics.update = (
   { name, password }
-) {
-  return flow(function* () {
-    let player = yield model.findOne({ name }).exec()
+) => flow(function* () {
+  let player = yield model.findOne({ name }).exec()
 
-    if (player === null) {
-      throw new Error('该用户不存在')
-    }
+  if (player === null) {
+    throw new Error('该用户不存在')
+  }
 
-    yield player.update({
-      name,
-      password: password
-    }).exec()
+  yield player.update({
+    name,
+    password: password
+  }).exec()
 
-    return {
-      _uid: player._uid
-    }
-  })
-}
+  return {
+    uid: player.uid
+  }
+})
 
 let model = conn.model('Player', playerSchema)
 module.exports = model

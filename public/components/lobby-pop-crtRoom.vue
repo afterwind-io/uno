@@ -34,13 +34,13 @@ export default {
         password: this.password
       }
       api.createRoom(postData, res => {
-        shared.room = res.room
+        shared.room = res
 
         api.joinRoom({
-          gid: shared.player._gid,
+          uid: shared.player._uid,
           roomId: shared.room.id
         }, res => {
-          shared.room = res.room
+          shared.room = res
           this.$emit('close-pop-crt-room')
           nav.go('room')
         })

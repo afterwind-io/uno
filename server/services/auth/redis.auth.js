@@ -7,27 +7,26 @@ const redis = new Redis({
   db: 0
 })
 
-module.exports = {
-  add ({ gid }) {
-    return flow(function* () {
-      let _gid = gid.toString()
-      yield redis.sadd('onlines', _gid)
-      return _gid
-    })
-  },
-  remove ({ gid }) {
-    return flow(function* () {
-      let _gid = gid.toString()
-      yield redis.srem('onlines', _gid)
-      return _gid
-    })
-  },
-  check ({ gid }) {
-    console.log('auth check ', gid)
-    return flow(function* () {
-      let _gid = gid.toString()
-      let result = yield redis.sismember('onlines', _gid)
-      return result === 1
-    })
-  }
-}
+module.exports.add = (
+  { uid }
+) => flow(function* () {
+  let _uid = uid.toString()
+  yield redis.sadd('onlines', _uid)
+  return _uid
+})
+
+module.exports.remove = (
+  { uid }
+) => flow(function* () {
+  let _uid = uid.toString()
+  yield redis.srem('onlines', _uid)
+  return _uid
+})
+
+module.exports.check = (
+  { uid }
+) => flow(function* () {
+  let _uid = uid.toString()
+  let result = yield redis.sismember('onlines', _uid)
+  return result === 1
+})

@@ -8,6 +8,7 @@ const logger = require('../../middlewares/logger.js')('Main')
 const auth = require('../../middlewares/auth.js')
 const session = require('./middlewares/session.js')
 const routerUser = require('./routes/user.js')
+const routerRoom = require('./routes/room.js')
 
 app.use(cors)
 app.use(bodyParser.json())
@@ -16,6 +17,7 @@ app.use(session)
 
 app.use(auth)
 app.use('/api/user', routerUser)
+app.use('/api/room', routerRoom)
 
 module.exports = {
   start () {

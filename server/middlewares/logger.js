@@ -14,11 +14,11 @@
 //   ]
 // })
 
-module.exports = (source) => {
+module.exports = source => {
   return (req, res, next) => {
     let time = new Date()
     console.log(
-      `[${time.getFullYear()}-${time.getMonth() + 1}-${time.getDay()} ` +
+      `[${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ` +
       `${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]` +
       `[${source}] <= ${req.method}: ${req.path} ${JSON.stringify(req.body)}`
     )

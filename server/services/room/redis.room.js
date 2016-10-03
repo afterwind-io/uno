@@ -72,13 +72,8 @@ class Room {
   }
 
   toPackage () {
-    return {
-      id: this.id,
-      name: this.name,
-      players: this.players,
-      limit: this.limit,
-      status: this.status
-    }
+    return ['id', 'name', 'players', 'limit', 'status']
+      .reduce((o, prop) => Object.assign(o, { [prop]: this[prop] }), {})
   }
 
   toString () {
@@ -86,11 +81,7 @@ class Room {
   }
 
   static parse (str) {
-    let o = JSON.parse(str)
-
-    let room = new Room(o)
-
-    return room
+    return new Room(JSON.parse(str))
   }
 }
 
@@ -99,69 +90,73 @@ redis.set('idGen', 0)
 // 新建大厅
 redis.set(LOBBY_ID, (new Room({id: LOBBY_ID, name: 'Lobby'})).toString())
 
-module.exports = {
-  create (info) {
-    return flow(function* () {
-      let id = yield redis.incr('idGen')
-      let room = new Room({
-        id,
-        name: info.name,
-        isPublic: info.isPublic,
-        password: info.password
-      })
-      yield redis.set(id, room.toString())
-      yield redis.lpush('rooms', id)
-      return room
-    })
-  },
-  remove (id) {
-    return flow(function* () {
-      yield redis.del(id)
-      return redis.lrem('rooms', 0, id)
-    })
-  },
-  addPlayer ({roomId, gid}) {
-    return flow(function* () {
-      let s = yield redis.get(roomId)
-      let room = Room.parse(s)
-      room.addPlayer(gid)
-      return redis.set(roomId, room.toString())
-    })
-  },
-  removePlayer ({roomId, gid}) {
-    return flow(function* () {
-      let s = yield redis.get(roomId)
-      let room = Room.parse(s)
-      room.removePlayer(gid)
-      return redis.set(roomId, room.toString())
-    })
-  },
-  getRooms (rangeMin, rangeMax) {
-    return flow(function* () {
-      if (rangeMin < 0 || rangeMax < 0) {
-        throw new Error(`取值范围无效。rangeMax:${rangeMax}, rangeMin:${rangeMin}`)
-      }
+module.exports.create = (
+  info
+) => flow(function* () {
+  let id = yield redis.incr('idGen')
+  let room = new Room({
+    id,
+    name: info.name,
+    isPublic: info.isPublic,
+    password: info.password
+  })
+  yield redis.set(id, room.toString())
+  yield redis.lpush('rooms', id)
+  return room.toPackage()
+})
 
-      // 始终优先获取最新创建的房间
-      let keys = yield redis.lrange('rooms', -rangeMax - 1, -rangeMin - 1)
+module.exports.remove = (
+  { roomId }
+) => flow(function* () {
+  yield redis.del(roomId)
+  return redis.lrem('rooms', 0, roomId)
+})
 
-      if (keys.length === 0) {
-        return []
-      } else {
-        let rooms = yield redis.mget(keys)
-        return rooms.map(r => {
-          return Room.parse(r)
-        })
-      }
-    })
-  },
-  getRoom (key) {
-    return flow(function* () {
-      let s = yield redis.get(key)
-      if (s === 'nil') {
-        throw new Error('指定的房间不存在')
-      }
-      return Room.parse(s)
-    })
+module.exports.get = (
+  { roomId }
+) => flow(function* () {
+  let s = yield redis.get(roomId)
+  return s == null ? {} : Room.parse(s).toPackage()
+})
+
+/**
+ * 根据索引范围返回房间信息，去除了不必要的信息
+ * @param   {number}  start  开始索引
+ * @param   {number}  end    结束索引
+ * @return  {array}          查找到的房间组
+ */
+module.exports.getMany = (
+  { start, end }
+) => flow(function* () {
+  if (start < 0 || end < 0) {
+    throw new Error(`取值范围无效。start:${start}, end:${end}`)
   }
-}
+
+  // 始终优先获取最新创建的房间
+  let keys = yield redis.lrange('rooms', -end - 1, -start - 1)
+
+  if (keys.length === 0) {
+    return []
+  } else {
+    let rooms = yield redis.mget(keys)
+    return rooms.map(r => Room.parse(r).toPackage())
+  }
+})
+
+module.exports.addPlayer = (
+  { roomId, uid }
+) => flow(function* () {
+  let s = yield redis.get(roomId)
+  let room = Room.parse(s)
+  room.addPlayer(uid)
+  return redis.set(roomId, room.toString())
+})
+
+module.exports.remPlayer = (
+  { roomId, uid }
+) => flow(function* () {
+  let s = yield redis.get(roomId)
+  let room = Room.parse(s)
+  room.removePlayer(uid)
+  return redis.set(roomId, room.toString())
+})

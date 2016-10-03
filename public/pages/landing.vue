@@ -28,7 +28,7 @@ export default {
   methods: {
     register () {
       api.register(
-        {username: this.user.name, password: ''},
+        {name: this.user.name, password: ''},
         (res) => {
           ws.login({pid: res._pid})
           shared.player = res.player
@@ -38,7 +38,7 @@ export default {
     },
     login () {
       api.login(
-        {username: this.user.name, password: ''},
+        {name: this.user.name, password: ''},
         (res) => {
           ws.login({pid: res._pid})
           shared.player = res.player

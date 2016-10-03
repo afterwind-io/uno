@@ -3,7 +3,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const routes = require('./routes')
-const logger = require('../../middlewares/logger.js')('Auth')
+const logger = require('../../middlewares/logger.js')('AUTH')
 const ports = require('../../config.js').ports
 
 app.use(bodyParser.json())

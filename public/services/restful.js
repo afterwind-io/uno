@@ -1,13 +1,20 @@
-import $ from 'jquery'
-
-$.ajaxSetup({
-  contentType: 'application/json; charset=utf-8'
-})
+import request from 'superagent'
 
 export default {
   post (uri, data, sc, fc) {
-    $.post(uri, JSON.stringify(data))
-      .done((res) => { if (sc) sc(res) })
-      .fail((res) => { if (fc) fc(res) })
+    request.post(uri)
+      .set({
+        'Content-Type': 'application/json'
+      })
+      .withCredentials()
+      .timeout(1000 * 30)
+      .send(data)
+      .end((err, res) => {
+        if (err) {
+          if (fc) fc(err)
+        } else {
+          if (sc) sc(res.body)
+        }
+      })
   }
 }

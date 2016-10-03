@@ -3,10 +3,9 @@
  *  For: Players Data
  *
  *  Data Structure:
- *    "idGen": "0",                ID Generator    String
- *    "players": ["", "", ...]     GID List        List
- *    "0:1a2b3c4d": "{...}",       Player Data     String
- *    "1:5a6b7c8d": "{...}",
+ *    "players": ["", "", ...]     uid List        List
+ *    "1a2b3c4d": "{...}",         Player Data     String
+ *    "5a6b7c8d": "{...}",
  *    ...
  */
 
@@ -26,10 +25,8 @@ const playerStatus = {
 }
 
 class Player {
-  constructor (pid, info) {
-    this._uid = info._uid
-    this._pid = pid
-    this._gid = `${this._pid}:${this._uid}`
+  constructor (info) {
+    this.uid = info.uid
     this.name = info.name
     this.status = info.status || playerStatus.idle
     this.roomId = info.roomId || 0
@@ -40,70 +37,67 @@ class Player {
   }
 
   static parse (str) {
-    let o = JSON.parse(str)
-    return new Player(o._pid, o)
+    return new Player(JSON.parse(str))
   }
 }
 
-// 产生id计数器
-redis.set('idGen', -1)
+module.exports.create = (
+  playerInfo
+) => flow(function* () {
+  let player = new Player(playerInfo)
+  yield redis.set(player.uid, player.toString())
+  yield redis.lpush('players', player.uid)
+  return player
+})
 
-module.exports = {
-  create (playerInfo) {
-    return flow(function* () {
-      let id = yield redis.incr('idGen')
-      let player = new Player(id, playerInfo)
-      yield redis.set(player._gid, player.toString())
-      yield redis.lpush('players', player._gid)
-      return player
-    })
-  },
-  clear (playerUid) {
-    return flow(function* () {
-      let keys = yield redis.keys(`*${playerUid}`)
-      let key = keys[0]
-      let info = yield redis.get(key)
-      yield redis.del(key)
-      yield redis.lrem('players', 0, key)
-      return Player.parse(info)
-    })
-  },
-  getPlayers (playerGids) {
-    return flow(function* () {
-      let s = yield redis.mget(playerGids)
-      return s.map(p => {
-        let player = Player.parse(p)
-        return player
-      })
-    })
-  },
-  getAllPlayers (rangeMin, rangeMax) {
-    return flow(function* () {
-      if (rangeMin < 0 || rangeMax < 0) {
-        throw new Error(`取值范围无效。rangeMax:${rangeMax}, rangeMin:${rangeMin}`)
-      }
+module.exports.remove = (
+  { uid }
+) => flow(function* () {
+  let info = yield redis.get(uid)
+  yield redis.del(uid)
+  yield redis.lrem('players', 0, uid)
+  return Player.parse(info)
+})
 
-      // 始终优先获取最新加入的玩家
-      let keys = yield redis.lrange('players', -rangeMax - 1, -rangeMin - 1)
-      let players = yield redis.mget(keys)
-      return players.map(p => {
-        return Player.parse(p)
-      })
-    })
-  },
-  changeRoom (playerGid, roomId) {
-    return flow(function* () {
-      let s = yield redis.get(playerGid)
-      let player = Player.parse(s)
+module.exports.get = (
+  { uid }
+) => flow(function* () {
+  let s = yield redis.get(uid)
+  return s == null ? {} : Player.parse(s)
+})
 
-      if (player.status !== playerStatus.idle) {
-        throw new Error('该玩家正在游戏中，无法切换房间')
-      }
+module.exports.getMany = (
+  { uids }
+) => flow(function* () {
+  let s = yield redis.mget(uids)
+  return s.map(p => Player.parse(p))
+})
 
-      let oldId = player.roomId
-      player.roomId = roomId
-      yield redis.set(player._gid, player.toString())
-      return oldId
-    })
+module.exports.getAll = (
+  { start, end }
+) => flow(function* () {
+  if (start < 0 || end < 0) {
+    throw new Error(`取值范围无效。end:${end}, start:${start}`)
   }
-}
+
+  // 始终优先获取最新加入的玩家
+  let keys = yield redis.lrange('players', -end - 1, -start - 1)
+  let players = yield redis.mget(keys)
+  return players.map(p => Player.parse(p))
+})
+
+module.exports.changeRoom = (
+  { uid, roomId }
+) => flow(function* () {
+  let s = yield redis.get(uid)
+  let player = Player.parse(s)
+
+  if (player.status !== playerStatus.idle) {
+    throw new Error('该玩家正在游戏中，无法切换房间')
+  }
+
+  let oldId = player.roomId
+  player.roomId = roomId
+  yield redis.set(player.uid, player.toString())
+  return oldId
+})

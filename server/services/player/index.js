@@ -2,7 +2,7 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-const logger = require('../../middlewares/logger.js')('Main')
+const logger = require('../../middlewares/logger.js')('PLYR')
 const routes = require('./routes.js')
 const ports = require('../../config.js').ports
 

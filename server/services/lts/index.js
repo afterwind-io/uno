@@ -3,7 +3,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
-const logger = require('../../middlewares/logger.js')('LTS')
+const logger = require('../../middlewares/logger.js')('LTS ')
 const routes = require('./routes.js')
 const ports = require('../../config.js').ports
 

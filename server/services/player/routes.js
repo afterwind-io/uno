@@ -1,66 +1,20 @@
 const flow = require('../../utils/async.js').flow
-const response = require('../../utils/response.js')
+const reply = (require('../../utils/response.js'))('PLYR')
 const express = require('express')
 const router = express.Router()
 const redisPlayer = require('./redis.player.js')
 
-router.post('/create', (req, res) => {
-  flow(function* () {
-    try {
-      let result = yield redisPlayer.create(req.body)
-      response.reply(0, { result }, res)
-    } catch (e) {
-      response.reply(-1, e, res)
-    }
+for (let method in redisPlayer) {
+  router.post(`/${method}`, ({ body }, res) => {
+    flow(function* () {
+      try {
+        let result = yield redisPlayer[method](body)
+        reply(0, result, res)
+      } catch (e) {
+        reply(-1, e, res)
+      }
+    })
   })
-})
-
-router.post('/clear', (req, res) => {
-  flow(function* () {
-    try {
-      let result = yield redisPlayer.clear(req.body.uids)
-      response.reply(0, { result }, res)
-    } catch (e) {
-      response.reply(-1, e, res)
-    }
-  })
-})
-
-router.post('/getPlayers', (req, res) => {
-  flow(function* () {
-    try {
-      let result = yield redisPlayer.getPlayers(req.body.gids)
-      response.reply(0, { result }, res)
-    } catch (e) {
-      response.reply(-1, e, res)
-    }
-  })
-})
-
-router.post('/getAllPlayers', (req, res) => {
-  flow(function* () {
-    try {
-      let result = yield redisPlayer.getAllPlayers(
-        req.body.info.min, req.body.info.max
-      )
-      response.reply(0, { result }, res)
-    } catch (e) {
-      response.reply(-1, e, res)
-    }
-  })
-})
-
-router.post('/changeRoom', (req, res) => {
-  flow(function* () {
-    try {
-      let result = yield redisPlayer.changeRoom(
-        req.body.info.gid, req.body.roomId
-      )
-      response.reply(0, { result }, res)
-    } catch (e) {
-      response.reply(-1, e, res)
-    }
-  })
-})
+}
 
 module.exports = router

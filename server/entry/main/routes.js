@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router()
-const api_user = require('./routes/user.js')
-// const api_room = require('./routes/room.js')
+const apiUser = require('./routes/user.js')
+const apiRoom = require('./routes/room.js')
 
-router.use('/api/user', api_user)
-// app.use('/api/room', api_room)
+router.use('/api/user', apiUser)
+router.use('/api/room', apiRoom)
 module.exports = router

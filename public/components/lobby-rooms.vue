@@ -28,9 +28,9 @@ let _setValue = Vue.set.bind(null, _data)
 
 let _refresh = function(){
   api.getRooms(
-    { rangeMin: 0, rangeMax: 50 },
+    { start: 0, end: 50 },
     res => {
-      _setValue('rooms', res.rooms)
+      _setValue('rooms', res)
     }
   )
 }
@@ -54,10 +54,10 @@ export default {
   methods: {
     join (room) {
       api.joinRoom({
-        gid: shared.player._gid,
+        uid: shared.player._uid,
         roomId: room.id
       }, res => {
-        shared.room = res.room
+        shared.room = res
         nav.go('room')
       })
     },

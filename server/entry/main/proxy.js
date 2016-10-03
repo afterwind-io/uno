@@ -1,4 +1,4 @@
-const request = require('request')
+const request = require('superagent')
 const ports = require('../../config.js').ports
 
 const req = {
@@ -14,21 +14,22 @@ module.exports = (service) => {
 
   let port = ports[service]
   return (api, data) => {
-    req.uri = `http://127.0.0.1:${port}/service/${service}/${api}`
-    req.body = data
+    let uri = `http://127.0.0.1:${port}/service/${service}/${api}`
 
-    return new Promise((resolve, reject) => {
-      request(req, (err, res, body) => {
-        if (res.statusCode === 200) {
-          if (res.body.code === -1) {
-            reject(res.body)
-          } else {
-            resolve(body)
-          }
-        } else {
-          reject(err)
-        }
+    return request.post(uri)
+      .set({
+        'Content-Type': 'application/json'
       })
-    })
+      .withCredentials()
+      .timeout(1000 * 30)
+      .send(data)
+      .then(({ body }) => {
+        if (body.code === -1) return Promise.reject(body)
+
+        return Promise.resolve(body)
+      })
+      .catch(err => {
+        return Promise.reject(err)
+      })
   }
 }
