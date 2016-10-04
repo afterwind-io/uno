@@ -6,6 +6,7 @@ const reply = (require('../../../utils/response.js'))('room')
 
 const proxyPlayer = (require('../proxy.js'))('player')
 const proxyRoom = (require('../proxy.js'))('room')
+const proxyWS = (require('../proxy.js'))('ws')
 
 router.post('/create', (
   { body }, res
@@ -46,6 +47,8 @@ router.post('/join', (
       })
       room.players = players
 
+      yield proxyWS('updateOnlineStatus')
+
       reply(0, room, res)
     } catch (e) {
       reply(-1, e, res)
@@ -81,6 +84,8 @@ router.post('/leave', (
           })
         }
       }
+
+      yield proxyWS('updateOnlineStatus')
 
       reply(0, {}, res)
     } catch (e) {

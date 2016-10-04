@@ -2,7 +2,7 @@
     <div class="Component">
         <h2>Chat</h2>
         <div class="chatsContainer">
-          <p v-for="chat in chats">{{chat.content}}</p>
+          <p v-for="chat in chats">{{chat}}</p>
         </div>
         <input type="text" v-model="msg">
         <input type="button" value="Send" @click="send()">
@@ -17,9 +17,9 @@ let _chats = []
 let _msg = ''
 
 let _socket = ws.register (res => {
-  switch (res.title) {
+  switch (res.head) {
     case 'chat':
-      _chats.push(res)
+      _chats.push(res.body)
       break
     default:
       break
@@ -27,12 +27,6 @@ let _socket = ws.register (res => {
 })
 
 export default {
-  ready(){
-    _socket.send({
-      title: 'login',
-      content: ''
-    })
-  },
   props: [],
   data () {
     return {
@@ -43,8 +37,8 @@ export default {
   methods: {
     send (event) {
       _socket.send({
-        title: 'chat',
-        content: `[${shared.player.name}] ${this.msg}`
+        head: 'chat',
+        body: {id: 0, msg: `[${shared.player.name}] ${this.msg}`}
       })
       this.msg = ''
     }

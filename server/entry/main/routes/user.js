@@ -8,6 +8,7 @@ const proxyAuth = (require('../proxy.js'))('auth')
 const proxyLTS = (require('../proxy.js'))('lts')
 const proxyPlayer = (require('../proxy.js'))('player')
 const proxyRoom = (require('../proxy.js'))('room')
+const proxyWS = (require('../proxy.js'))('ws')
 
 router.post('/register', (
   { body, session }, res
@@ -29,6 +30,8 @@ router.post('/register', (
         uid: player.uid
       })
       session.uid = player.uid
+
+      yield proxyWS('updateOnlineStatus')
 
       reply(0, { player }, res)
     } catch (e) {
@@ -62,6 +65,8 @@ router.post('/login', (
         uid: player.uid
       })
       session.uid = player.uid
+
+      yield proxyWS('updateOnlineStatus')
 
       reply(0, { player }, res)
     } catch (e) {
@@ -98,6 +103,8 @@ router.post('/logout', (
         uid: player.uid
       })
       session.uid = ''
+
+      yield proxyWS('updateOnlineStatus')
 
       reply(0, {}, res)
     } catch (e) {

@@ -1,5 +1,5 @@
 const main = require('./server/entry/main/index.js')
-// const ws = require('./server/entry/websocket/index.js')
+const ws = require('./server/entry/websocket/index.js')
 const dist = require('./server/entry/public/index.js')
 
 const serviceLTS = require('./server/services/lts/index.js')
@@ -13,5 +13,5 @@ servicePlayer.start()
 serviceRoom.start()
 
 main.start()
-// ws.start()
+ws.start()
 dist.start()

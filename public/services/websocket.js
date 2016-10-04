@@ -14,18 +14,18 @@ function _emit (msg) {
 export default {
   init () {
     if (typeof _socket === 'undefined') {
-      // _socket = ws(wsServerUrl)
+      _socket = ws(wsServerUrl)
     }
   },
   login (params) {
     if (typeof _socket === 'undefined') return
 
-    _emit({ title: 'login', content: params })
+    _emit({ head: 'login', body: params })
   },
   logout () {
     if (typeof _socket === 'undefined') return
 
-    _emit({ title: 'logout', content: '' })
+    _emit({ head: 'logout', body: '' })
   },
   register (callback) {
     if (typeof _socket === 'undefined') return

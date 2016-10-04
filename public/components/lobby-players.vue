@@ -32,8 +32,8 @@ let _refresh = function(){
 }
 
 let _socket = ws.register (res => {
-  switch (res.title) {
-    case 'online status':
+  switch (res.head) {
+    case 'updateOnlineStatus':
       _refresh()
       break
     default:
