@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import router from './routes.js'
+import store from './store/index.js'
 import './app.less'
 import main from './app.vue'
 
 new Vue({
+  store,
   router,
-  template: main.template,
-  render: main.render
+  ...main
 }).$mount('#app')
 
 // import {Player, Uno} from './uno.js'

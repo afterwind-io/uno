@@ -4,16 +4,15 @@
     <h3>Mini Version</h3>
     <p>Player Name:</p>
     <input type="text" v-model="user.name">
-    <input type="button" @click="register" value="Register">
-    <input type="button" @click="login" value="Login">
+    <input type="button" @click="_register" value="注册">
+    <input type="button" @click="_login" value="登录">
   </div>
 </template>
 
 <script>
-import api from '../services/api.js'
+import { mapActions } from 'vuex'
 import ws from '../services/websocket.js'
 import nav from '../services/navigation.js'
-import shared from '../services/shared.js'
 
 ws.init()
 
@@ -21,30 +20,26 @@ export default {
   data () {
     return {
       user: {
-        name: 'Doge'
+        name: 'Doge',
+        password: ''
       }
     };
   },
   methods: {
-    register () {
-      api.register(
-        {name: this.user.name, password: ''},
-        (res) => {
-          ws.login({uid: res.player.uid})
-          shared.player = res.player
+    ...mapActions(['register', 'login']),
+    _register () {
+      this.register(this.user)
+        .then(res => {
+          ws.login({uid: res.uid})
           nav.go('lobby')
-        }
-      )
+        })
     },
-    login () {
-      api.login(
-        {name: this.user.name, password: ''},
-        (res) => {
-          ws.login({uid: res.player.uid})
-          shared.player = res.player
+    _login () {
+      this.login(this.user)
+        .then(res => {
+          ws.login({uid: res.uid})
           nav.go('lobby')
-        }
-      )
+        })
     }
   }
 }

@@ -23,35 +23,34 @@ function _releaseLock (req) {
   index !== -1 ? _locks.splice(index, 1) : ''
 }
 
-function _apiGen (apis) {
-  return apis.reduce(
-    (o, api) => {
-      if (o.hasOwnProperty(api.name)) {
-        _debug.warn(`[api]Duplicate api definition! Api: ${api.name}`)
+const apiGen = apis => apis.reduce(
+  (o, api) => {
+    if (o.hasOwnProperty(api.name)) {
+      _debug.warn(`[api]Duplicate api definition! Api: ${api.name}`)
 
-        return o
-      } else {
-        return Object.defineProperty(o, api.name, {
-          value: function (data, sc, fc) {
-            _debug.done(`[req]<${api.name}> is pending...`, JSON.stringify(data))
+      return o
+    } else {
+      return Object.defineProperty(o, api.name, {
+        value: function (data) {
+          _debug.done(`[req]<${api.name}> is pending...`, JSON.stringify(data))
 
-            if (!_requireLock(api.name)) return
+          if (!_requireLock(api.name)) return
 
+          return new Promise((resolve, reject) => {
             rest[api.method](apiServerUrl + api.uri, data,
               res => {
                 _releaseLock(api.name)
                 _debug.done(`[req]<${api.name}> fetched.`, res)
-                if (sc) sc(res)
+                resolve(res)
               },
-              res => {
+              err => {
                 _releaseLock(api.name)
-                if (fc) fc(res)
-              }
-            )
-          }
-        })
-      }
-    }, {})
-}
+                reject(err)
+              })
+          })
+        }
+      })
+    }
+  }, {})
 
-export default _apiGen(apis)
+export default apiGen(apis)

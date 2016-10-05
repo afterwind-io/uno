@@ -1,71 +1,71 @@
 <template>
   <div class="Component">
-    <h2>Rooms: {{rooms.length}}</h2>
-    <div class="roomContainer">
-      <input type="text" placeholder="搜索房间" v-model="search">
-      <input type="button" value="创建..." @click="create">
-      <input type="button" value="刷新列表" @click="refresh">
-      <div class="roomBox" v-for="room in rooms">
-        <p>{{room.id}}: {{room.name}} {{room.players.length}}/{{room.limit}} {{room.status}}</p>
-        <input type="button" value="加入" @click="join(room)">
-      </div>
+    <h2>Rooms: {{gameRooms.length}}</h2>
+    <input type="text" placeholder="搜索房间" v-model="search">
+    <input type="button" value="创建..." @click="_create()">
+    <input type="button" value="刷新列表" @click="_refresh()">
+
+    <div class="roomContainer" v-for="room in filteredRooms">
+      <p>{{room.id}}: {{room.name}} {{room.players.length}}/{{room.limit}} {{room.status}}</p>
+      <input type="button" value="加入" @click="_join(room)">
     </div>
   </div>
 </template>
 
 <script>
-import Vue from 'vue'
-import api from '../services/api.js'
+import { mapGetters, mapActions } from 'vuex'
 import ws from '../services/websocket.js'
-import shared from '../services/shared.js'
 import nav from '../services/navigation.js'
-
-let _data = {
-  rooms: [],
-  search: ''
-}
-let _setValue = Vue.set.bind(null, _data)
-
-let _refresh = function(){
-  api.getRooms(
-    { start: 0, end: 50 },
-    res => {
-      _setValue('rooms', res)
-    }
-  )
-}
-
-let _socket = ws.register (res => {
-  switch (res.head) {
-    case 'updateOnlineStatus':
-      _refresh()
-      break
-    default:
-      break
-  }
-})
-
 
 export default {
   data() {
-    return _data
+    return { search: '' }
   },
-  computed: {},
+  computed: {
+    ...mapGetters(['gameRooms']),
+    filteredRooms () {
+      return this.search === ''
+        ? this.gameRooms
+        : this.gameRooms.filter(r => r.name.includes(this.search))
+    }
+  },
   methods: {
-    join (room) {
-      api.joinRoom({
-        uid: shared.player._uid,
-        roomId: room.id
-      }, res => {
-        shared.room = res
-        nav.go('room')
-      })
+    ...mapActions([
+      'refreshGameRooms',
+      'joinGameRoom',
+      'joinChat',
+      'switchPopCreateGameRoom'
+    ]),
+    _refresh () {
+      this.refreshGameRooms()
     },
-    create () {
-      this.$emit('show-pop-crt-room')
+    _create () {
+      this.switchPopCreateGameRoom()
     },
-    refresh: _refresh
+    _join ({ id }) {
+      this.joinGameRoom(id)
+        .then(res => {
+          this.joinChat({ id: res.id, name: `房间#${res.id}` })
+          nav.go('room')
+        })
+    }
   },
+  created () {
+    let _this = this
+
+    ws.register ({
+      module: 'lobby-rooms',
+      handler (res) {
+        switch (res.head) {
+          case 'updateOnlineStatus':
+            _this.refreshGameRooms()
+            break
+          default:
+            break
+        }
+      }
+    })
+  }
 };
 </script>
 

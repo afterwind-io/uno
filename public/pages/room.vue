@@ -8,42 +8,39 @@
         <p>{{player.status}}</p>
       </div>
     </div>
-    <input type="button" value="准备" @click="ready">
-    <input type="button" value="返回大厅" @click="leave">
+    <input type="button" value="准备" @click="ready()">
+    <input type="button" value="返回大厅" @click="leave()">
   </div>
 </template>
 
 <script>
-import api from '../services/api.js'
+import { mapGetters, mapActions } from 'vuex'
 import nav from '../services/navigation.js'
-import shared from '../services/shared.js'
-
-let _data = shared.room
 
 export default {
-  data() {
-    return _data
-  },
   computed: {
+    ...mapGetters(['currentGameRoom', 'player']),
     roomName () {
-      return shared.room.name
+      return this.currentGameRoom.name
     },
     players () {
-      return shared.room.players
+      return this.currentGameRoom.players
     }
   },
   methods: {
+    ...mapActions([
+      'leaveGameRoom',
+      'leaveChat'
+    ]),
     ready () {
 
     },
     leave () {
-      api.leaveRoom({
-        uid: shared.player._uid,
-        roomId: shared.room.id
-      }, res => {
-        shared.room = {}
-        nav.go('lobby')
-      })
+      this.leaveGameRoom()
+        .then(res => {
+          this.leaveChat(this.currentGameRoom.id)
+          nav.go('lobby')
+        })
     }
   },
   components: {}

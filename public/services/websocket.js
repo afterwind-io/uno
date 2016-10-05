@@ -4,6 +4,7 @@ import debug from './debug.js'
 
 const _TUNNEL = 'main'
 let _socket
+let _modules = new Set()
 let _debugger = debug.getDebugger('ws')
 
 function _emit (msg) {
@@ -27,12 +28,14 @@ export default {
 
     _emit({ head: 'logout', body: '' })
   },
-  register (callback) {
+  register ({module, handler}) {
     if (typeof _socket === 'undefined') return
+    if (_modules.has(module)) return
 
+    _modules.add(module)
     _socket.on(_TUNNEL, msg => {
       _debugger.done('[msg] <=', JSON.stringify(msg))
-      callback(msg)
+      handler(msg)
     })
 
     return {
