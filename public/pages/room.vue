@@ -9,6 +9,7 @@
       </div>
     </div>
     <input type="button" value="准备" @click="ready()">
+    <input type="button" value="开始" @click="start()">
     <input type="button" value="返回大厅" @click="leave()">
   </div>
 </template>
@@ -21,6 +22,9 @@ import ws from '../services/websocket.js'
 export default {
   computed: {
     ...mapGetters(['currentGameRoom', 'user']),
+    roomId () {
+      return this.currentGameRoom.id
+    },
     roomName () {
       return this.currentGameRoom.name
     },
@@ -41,9 +45,23 @@ export default {
     leave () {
       this.leaveGameRoom()
         .then(res => {
-          this.leaveChat(this.currentGameRoom.id)
+          this.leaveChat(this.roomId)
           nav.go('lobby')
         })
+    },
+    start () {
+      // TODO
+      ws.getSocket().emit('game', {
+        head: 'forward',
+        body: {
+          gameName: 'uno',
+          action: 'start',
+          payload: {
+            roomId: this.roomId,
+            players: this.players
+          }
+        }
+      })
     }
   },
   created () {

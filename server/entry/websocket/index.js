@@ -17,7 +17,7 @@ app.use('/service/ws', routerPublic(io))
 // })
 require('./routes/main.js').route(io)
 require('./routes/chat.js').route(io)
-// require('./routes/uno.js').route(io)
+require('./routes/game.js').route(io)
 
 module.exports = {
   start: function () {

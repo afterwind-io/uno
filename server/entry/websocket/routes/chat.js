@@ -2,13 +2,6 @@ const debug = require('../../../utils/logger.js')
 const idGen = require('../../../utils/idGen.js')
 const socketMap = require('../map.js')
 
-function emitMessage (channel, msg, io) {
-  io.to(channel).emit({
-    head: 'broadcast',
-    body: msg
-  })
-}
-
 const handlers = {
   login ({ uid }, socket, io) {
     // 默认加入大厅频道

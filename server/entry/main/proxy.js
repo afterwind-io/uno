@@ -1,12 +1,6 @@
 const request = require('superagent')
 const ports = require('../../config.js').ports
 
-const req = {
-  method: 'POST',
-  json: true,
-  timeout: 1000 * 30
-}
-
 module.exports = (service) => {
   if (!ports.hasOwnProperty(service)) {
     throw new Error(`Service ${service} not found!`)

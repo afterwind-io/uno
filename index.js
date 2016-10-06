@@ -7,6 +7,8 @@ const serviceAuth = require('./server/services/auth/index.js')
 const servicePlayer = require('./server/services/player/index.js')
 const serviceRoom = require('./server/services/room/index.js')
 
+const gameUno = require('./server/entry/uno/index.js')
+
 serviceLTS.start()
 serviceAuth.start()
 servicePlayer.start()
@@ -15,3 +17,5 @@ serviceRoom.start()
 main.start()
 ws.start()
 dist.start()
+
+gameUno.start()
