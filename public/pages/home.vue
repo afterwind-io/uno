@@ -30,7 +30,10 @@ export default {
     ]),
     _logout () {
       // TODO
-      if(this.currentGameRoom.id) alert('请在退出登录前离开当前房间')
+      if(this.currentGameRoom.id){
+        alert('请在退出登录前离开当前房间')
+        return
+      }
 
       this.logout().then(res => {
         ws.logout()

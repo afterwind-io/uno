@@ -12,6 +12,14 @@ router.post('/updateOnlineStatus', (req, res) => {
   reply(0, {}, res)
 })
 
+router.post('/updateRoomStatus', (req, res) => {
+  _io.emit('main', {
+    head: 'updateRoomStatus',
+    body: req.body
+  })
+  reply(0, {}, res)
+})
+
 module.exports = io => {
   _io = io
   return router

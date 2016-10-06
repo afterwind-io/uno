@@ -101,3 +101,14 @@ module.exports.changeRoom = (
   yield redis.set(player.uid, player.toString())
   return oldId
 })
+
+module.exports.changeStatus = (
+  { uid, status }
+) => flow(function* () {
+  let s = yield redis.get(uid)
+  let player = Player.parse(s)
+
+  player.status = status
+  yield redis.set(player.uid, player.toString())
+  return player
+})

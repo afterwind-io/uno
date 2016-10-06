@@ -16,10 +16,11 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import nav from '../services/navigation.js'
+import ws from '../services/websocket.js'
 
 export default {
   computed: {
-    ...mapGetters(['currentGameRoom', 'player']),
+    ...mapGetters(['currentGameRoom', 'user']),
     roomName () {
       return this.currentGameRoom.name
     },
@@ -29,11 +30,13 @@ export default {
   },
   methods: {
     ...mapActions([
+      'switchUserState',
       'leaveGameRoom',
+      'refreshGameRoomStatus',
       'leaveChat'
     ]),
     ready () {
-
+      this.switchUserState()
     },
     leave () {
       this.leaveGameRoom()
@@ -43,7 +46,24 @@ export default {
         })
     }
   },
-  components: {}
+  created () {
+    let _this = this
+
+    ws.register ({
+      module: 'room',
+      handler (res) {
+        switch (res.head) {
+          case 'updateRoomStatus':
+            _this.refreshGameRoomStatus({
+              players: res.body
+            })
+            break
+          default:
+            break
+        }
+      }
+    })
+  }
 };
 </script>
 

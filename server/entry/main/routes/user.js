@@ -126,4 +126,75 @@ router.post('/getOnlinePlayers', (
   })
 })
 
+router.post('/switchStateIdle', (
+  { body }, res
+) => {
+  flow(function* () {
+    try {
+      let player = yield proxyPlayer('changeStatus', {
+        uid: body.uid,
+        status: 0
+      })
+
+      if (player.roomId !== 0) {
+        let room = yield proxyRoom('get', {
+          roomId: player.roomId
+        })
+        let players = yield proxyPlayer('getMany', {
+          uids: room.players
+        })
+
+        yield proxyWS('updateRoomStatus', players)
+      }
+
+      reply(0, {}, res)
+    } catch (e) {
+      reply(-1, e, res)
+    }
+  })
+})
+
+router.post('/switchStateReady', (
+  { body }, res
+) => {
+  flow(function* functionName () {
+    try {
+      let player = yield proxyPlayer('changeStatus', {
+        uid: body.uid,
+        status: 1
+      })
+
+      let room = yield proxyRoom('get', {
+        roomId: player.roomId
+      })
+      let players = yield proxyPlayer('getMany', {
+        uids: room.players
+      })
+
+      yield proxyWS('updateRoomStatus', players)
+
+      reply(0, {}, res)
+    } catch (e) {
+      reply(-1, e, res)
+    }
+  })
+})
+
+router.post('/switchStateBusy', (
+  { body }, res
+) => {
+  flow(function* functionName () {
+    try {
+      yield proxyPlayer('changeStatus', {
+        uid: body.uid,
+        status: 2
+      })
+
+      reply(0, {}, res)
+    } catch (e) {
+      reply(-1, e, res)
+    }
+  })
+})
+
 module.exports = router

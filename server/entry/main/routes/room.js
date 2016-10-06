@@ -48,6 +48,7 @@ router.post('/join', (
       room.players = players
 
       yield proxyWS('updateOnlineStatus')
+      yield proxyWS('updateRoomStatus', players)
 
       reply(0, room, res)
     } catch (e) {
@@ -82,6 +83,11 @@ router.post('/leave', (
           yield proxyRoom('remove', {
             roomId: oldRoomId
           })
+        } else {
+          let players = yield proxyPlayer('getMany', {
+            uids: room.players
+          })
+          yield proxyWS('updateRoomStatus', players)
         }
       }
 

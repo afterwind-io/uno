@@ -21,6 +21,10 @@ const mutations = {
   },
   GAMEROOM_SET_CURRENT (state, room) {
     state.currentRoom = room
+  },
+  GAMEROOM_SET_PLAYERS (state, players) {
+    state.currentRoom.players.splice(0)
+    state.currentRoom.players.push(...players)
   }
 }
 
@@ -54,6 +58,9 @@ const actions = {
       commit('GAMEROOM_SET_CURRENT', {})
       return res
     })
+  },
+  refreshGameRoomStatus ({ state, commit }, { players }) {
+    commit('GAMEROOM_SET_PLAYERS', players)
   }
 }
 
