@@ -1,9 +1,9 @@
 const socketMap = new Map()
 const uidMap = new Map()
 
-module.exports.cache = (socketId, uid) => {
-  socketMap.set(socketId, uid)
-  uidMap.set(uid, socketId)
+module.exports.cache = (socket, uid) => {
+  socketMap.set(socket.id, uid)
+  uidMap.set(uid, socket)
 }
 
 module.exports.remove = (socketId) => {

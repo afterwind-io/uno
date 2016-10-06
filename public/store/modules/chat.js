@@ -29,14 +29,14 @@ const getters = {
 }
 
 const mutations = {
-  CHATROOM_FOCUS (state, { id }) {
+  CHATROOM_FOCUS (state, id) {
     let room
     for (room of state.rooms) {
-      if (room.id === id) return room
+      if (room.id === id) break
     }
-    state.currentRoom = room
+    state.currentRoom = room || state.rooms[0]
   },
-  CHATROOM_JOIN (state, { id, name }) {
+  CHATROOM_CREATE (state, { id, name }) {
     let room = new ChatRoom(id, name)
     state.rooms.push(room)
     state.currentRoom = room
@@ -49,8 +49,12 @@ const mutations = {
   CHATROOM_MSG_CLR (state) {
     state.currentRoom.msg = ''
   },
-  CHATROOM_CHAT_ADD (state, msg) {
-    state.currentRoom.chats.push(msg)
+  CHATROOM_CHAT_ADD (state, info) {
+    let room
+    for (room of state.rooms) {
+      if (room.id === info.id) break
+    }
+    if (room) room.chats.push(info.msg)
   },
   CHATROOM_CHAT_CLR (state) {
     state.currentRoom.chats.splice(0)
@@ -58,11 +62,14 @@ const mutations = {
 }
 
 const actions = {
+  createChatRoom ({ state, commit }, info) {
+    commit('CHATROOM_CREATE', info)
+  },
   focus ({ state, commit }, id) {
     commit('CHATROOM_FOCUS', id)
   },
-  addChat ({ state, commit }, msg) {
-    commit('CHATROOM_CHAT_ADD', msg)
+  addChat ({ state, commit }, info) {
+    commit('CHATROOM_CHAT_ADD', info)
   },
   clearChat ({ state, commit }) {
     commit('CHATROOM_CHAT_CLR')
@@ -74,15 +81,13 @@ const actions = {
       head: 'chat',
       body: { id, msg }
     })
-    commit('CHATROOM_CHAT_ADD', msg)
     commit('CHATROOM_MSG_CLR')
   },
   joinChat ({ state, commit }, info) {
     socket.emit('main', {
       head: 'join',
-      body: { id: info.id }
+      body: info
     })
-    commit('CHATROOM_JOIN', info)
   },
   leaveChat ({ state, commit }, id) {
     socket.emit('main', {

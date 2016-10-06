@@ -46,7 +46,7 @@ const actions = {
       return res
     })
   },
-  leaveGameRoom ({ state, rootState, commit }) {
+  leaveGameRoom ({ state, commit }) {
     return api.leaveRoom({
       roomId: state.currentRoom.id
     })

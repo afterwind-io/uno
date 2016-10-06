@@ -33,7 +33,7 @@ router.post('/register', (
 
       yield proxyWS('updateOnlineStatus')
 
-      reply(0, { player }, res)
+      reply(0, player, res)
     } catch (e) {
       reply(-1, e, res)
     }
@@ -68,7 +68,7 @@ router.post('/login', (
 
       yield proxyWS('updateOnlineStatus')
 
-      reply(0, { player }, res)
+      reply(0, player, res)
     } catch (e) {
       reply(-1, e, res)
     }

@@ -1,4 +1,5 @@
 const debug = require('../../../utils/logger.js')
+const idGen = require('../../../utils/idGen.js')
 const socketMap = require('../map.js')
 
 function emitMessage (channel, msg, io) {
@@ -17,17 +18,32 @@ const handlers = {
     socketMap.cache(socket, uid)
 
     debug(`Player:${uid} entered Lobby`)
-    // emitMessage(0, msg, io)
   },
   logout (body, socket, io) {
     // 解除双向索引
     socketMap.remove(socket.id)
-
-    // debug(`Player:${uid} leaved Lobby`)
-    // emitMessage(0, msg, io)
   },
-  join ({ id }, socket) {
-    socket.join(id)
+  join ({ id, name }, socket, io) {
+    // FIXME
+    if (isNaN(parseInt(id))) {
+      let roomId = idGen()
+      socket.join(roomId)
+
+      let target = socketMap.get(id)
+      target.join(roomId)
+
+      io.to(roomId).emit('main', {
+        head: 'chatInitReq',
+        body: { id: roomId, name }
+      })
+    } else {
+      socket.join(id)
+
+      socket.emit('main', {
+        head: 'chatInitReq',
+        body: { id, name }
+      })
+    }
   },
   leave ({ id }, socket) {
     socket.leave(id)
@@ -35,7 +51,7 @@ const handlers = {
   chat ({ id, msg }, socket, io) {
     io.to(id).emit('main', {
       head: 'chat',
-      body: msg
+      body: { id, msg }
     })
   }
 }

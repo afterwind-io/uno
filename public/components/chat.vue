@@ -2,16 +2,15 @@
   <div class="Component">
     <h2>Chat</h2>
     <div class="room" v-for="room in chatRooms">
-      <div class="chatsContainer">
-        <h3 @click="focus(room.id)">{{room.name}}</h3>
+      <h3 @click="focus(room.id)">{{room.name}}</h3>
+      <div class="chatsContainer" v-show="room.id === currentChatRoom.id">
         <p v-for="chat in room.chats">{{chat}}</p>
-        <input type="text" v-model="msg">
-
-        <input type="button" value="清屏" @click="clearChat()">
-        <input type="button" value="发送" @click="send()">
-        <input type="button" value="离开" v-show="room.canLeave" @click="leaveChat()">
       </div>
     </div>
+    <input type="text" v-model="msg">
+    <input type="button" value="清屏" @click="clearChat()">
+    <input type="button" value="发送" @click="send()">
+    <input type="button" value="离开" v-show="currentChatRoom.canLeave" @click="leaveChat()">
   </div>
 </template>
 
@@ -25,10 +24,11 @@ export default {
   },
   computed: mapGetters([
     'chatRooms',
-    'currentRoom'
+    'currentChatRoom'
   ]),
   methods: {
     ...mapActions([
+      'createChatRoom',
       'focus',
       'addChat',
       'clearChat',
@@ -50,6 +50,9 @@ export default {
         switch (res.head) {
           case 'chat':
             _this.addChat(res.body)
+            break
+          case 'chatInitReq':
+            _this.createChatRoom(res.body)
             break
           default:
             break

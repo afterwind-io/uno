@@ -6,6 +6,7 @@
       <input type="button" value="刷新列表" @click="refresh()">
       <div class="playerBox" v-for="player in filteredPlayers">
         <p>{{player.name}} Room:{{player.roomId}} Status:{{player.status}}</p>
+        <input type="button" value="私聊" @click="pm(player)">
       </div>
     </div>
   </div>
@@ -30,7 +31,11 @@ export default {
   methods: {
     ...mapActions({
       refresh: 'refreshPlayers'
-    })
+    }),
+    ...mapActions(['joinChat']),
+    pm (player) {
+      this.joinChat({ id: player.uid, name: `@${player.name}` })
+    }
   },
   created () {
     let _this = this
