@@ -8,7 +8,6 @@ module.exports = {
     lts: 4011,
     auth: 4012,
     player: 4013,
-    room: 4014,
-    uno: 5000
+    room: 4014
   }
 }

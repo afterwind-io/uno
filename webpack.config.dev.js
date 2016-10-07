@@ -10,16 +10,14 @@ module.exports = {
       './public/app.js'
     ],
     vendor: [
-      // 'babel-polyfill',
       'jquery',
       'sockjs-client',
       'socket.io-client',
+      'superagent',
       'vue',
+      'vue-router',
+      'vuex',
       'vue-hot-reload-api'
-      // 'extract-text-webpack-plugin',
-      // 'babel-loader',
-      // 'css-loader',
-      // 'vue-loader',
     ]
   },
   output: {
@@ -38,6 +36,10 @@ module.exports = {
     }, {
       test: /\.less$/,
       loader: ExtractTextPlugin.extract('style', 'css!less')
+    }, {
+      test: /\.(png|jpg)$/,
+      exclude: /node_modules/,
+      loader: 'url'
     }]
   },
   plugins: [
@@ -51,7 +53,8 @@ module.exports = {
   ],
   vue: {
     loaders: {
-      less: ExtractTextPlugin.extract('css!less')
+      // less: ExtractTextPlugin.extract('css!less')
+      less: 'style!css!less'
     }
   }
 }
