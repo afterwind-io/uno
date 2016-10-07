@@ -15,3 +15,15 @@ new Vue({
 // let players = Array(6).fill(0).map(p => new Player())
 // let uno = new Uno(players)
 // uno.start()
+
+// class wow {
+//   constructor () {
+//     this.wooow()
+//   }
+//
+//   wooow () {
+//     console.log('sss')
+//   }
+// }
+//
+// let wow2 = new wow()

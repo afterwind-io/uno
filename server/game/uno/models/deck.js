@@ -6,6 +6,8 @@ class Deck {
     this.discards = []
     this.penalties = []
     this.NUM_HAND = 7
+
+    this.gen()
   }
 
   static shuffle (deck) {
@@ -55,11 +57,6 @@ class Deck {
 
     // TEST
     // this.deck.forEach(c => console.log(c.toString()))
-  }
-
-  init () {
-    this.gen()
-    this.pickFirst()
   }
 
   pickFirst () {

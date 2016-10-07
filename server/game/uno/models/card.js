@@ -1,3 +1,5 @@
+const text = require('../utils.js')
+
 class Card {
   constructor (color, symbol) {
     this.color = color
@@ -82,9 +84,9 @@ class Card {
   }
 
   toString () {
-    // let color = padRight(this.color, 6)
-    // let symbol = padRight(this.symbol, 3)
-    // return `Card=[Color: ${color} , Symbol: ${symbol}]`
+    let color = text.padRight(this.color, 6)
+    let symbol = text.padRight(this.symbol, 3)
+    return `Card=[Color: ${color} , Symbol: ${symbol}]`
   }
 
   toShortenString () {

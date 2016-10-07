@@ -7,7 +7,7 @@ const serviceAuth = require('./server/services/auth/index.js')
 const servicePlayer = require('./server/services/player/index.js')
 const serviceRoom = require('./server/services/room/index.js')
 
-const gameUno = require('./server/entry/uno/index.js')
+const gameUno = require('./server/game/uno/index.js')
 
 serviceLTS.start()
 serviceAuth.start()
