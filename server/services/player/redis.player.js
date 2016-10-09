@@ -28,6 +28,7 @@ class Player {
   constructor (info) {
     this.uid = info.uid
     this.name = info.name
+    this.type = info.type || 'doge'
     this.status = info.status || playerStatus.idle
     this.roomId = info.roomId || 0
   }

@@ -1,26 +1,22 @@
 import { apiServerUrl, apis } from '../config.js'
-import { findIndex } from './util.js'
 import debug from './debug.js'
 import rest from './restful.js'
 
 let _debug = debug.getDebugger('api')
 
-let _locks = []
-let _findLock = req => findIndex.bind(null, _locks, r => r === req)
+let _locks = new Set()
 
 function _requireLock (req) {
-  let flag = _findLock(req)() === -1
+  let flag = !_locks.has(req)
 
   flag
-    ? _locks.push(req)
+    ? _locks.add(req)
     : _debug.warn(`[req]api/${req} may duplicate, abort.`)
 
   return flag
 }
 function _releaseLock (req) {
-  let index = _findLock(req)()
-
-  index !== -1 ? _locks.splice(index, 1) : ''
+  _locks.delete(req)
 }
 
 const apiGen = apis => apis.reduce(

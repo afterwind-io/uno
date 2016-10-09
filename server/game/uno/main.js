@@ -28,7 +28,7 @@ const handlers = {
         return game.push()
       })
       .then(payload => {
-        broadcast(socket, roomId, 'update', payload)
+        broadcast(socket, roomId, 'gameStart', payload)
       })
   },
   call ({ roomId, deals }, socket) {

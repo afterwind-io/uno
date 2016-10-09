@@ -1,7 +1,5 @@
 import ws from '../../services/websocket.js'
 
-const socket = ws.getSocket()
-
 class ChatRoom {
   constructor (id, name) {
     this.id = id
@@ -77,20 +75,20 @@ const actions = {
   sendChat ({ state, commit }, msg) {
     let id = state.currentRoom.id
 
-    socket.emit('main', {
+    ws.emit('main', {
       head: 'chat',
       body: { id, msg }
     })
     commit('CHATROOM_MSG_CLR')
   },
   joinChat ({ state, commit }, info) {
-    socket.emit('main', {
+    ws.emit('main', {
       head: 'join',
       body: info
     })
   },
   leaveChat ({ state, commit }, id) {
-    socket.emit('main', {
+    ws.emit('main', {
       head: 'leave',
       body: { id: id || state.currentRoom.id }
     })

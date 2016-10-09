@@ -2,8 +2,8 @@
   <div class="Component">
     <h2>Rooms: {{gameRooms.length}}</h2>
     <input type="text" placeholder="搜索房间" v-model="search">
-    <input type="button" value="创建..." @click="_create()">
-    <input type="button" value="刷新列表" @click="_refresh()">
+    <input type="button" value="创建..." @click="create()">
+    <input type="button" value="刷新列表" @click="refresh()">
 
     <div class="roomContainer" v-for="room in filteredRooms">
       <p>{{room.id}}: {{room.name}} {{room.players.length}}/{{room.limit}} {{room.status}}</p>
@@ -30,18 +30,14 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      refresh: 'refreshGameRooms',
+      create: 'switchPopCreateGameRoom'
+    }),
     ...mapActions([
-      'refreshGameRooms',
       'joinGameRoom',
       'joinChat',
-      'switchPopCreateGameRoom'
     ]),
-    _refresh () {
-      this.refreshGameRooms()
-    },
-    _create () {
-      this.switchPopCreateGameRoom()
-    },
     _join ({ id }) {
       this.joinGameRoom(id)
         .then(res => {
@@ -55,14 +51,8 @@ export default {
 
     ws.register ({
       module: 'lobby-rooms',
-      handler (res) {
-        switch (res.head) {
-          case 'updateOnlineStatus':
-            _this.refreshGameRooms()
-            break
-          default:
-            break
-        }
+      main (res) {
+        if(res.head === 'updateOnlineStatus') _this.refresh()
       }
     })
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="mainFrame">
-    <h1>Room: {{roomName}}</h1>
+    <h1>Room: {{roomName}} ({{playerNum}}/{{limit}})</h1>
     <h2>Players</h2>
     <div class="playersContainer">
       <div class="playerBox" v-for="player in players">
@@ -8,6 +8,7 @@
         <p>{{player.status}}</p>
       </div>
     </div>
+    <input type="button" value="添加电脑玩家" @click="_addBot()">
     <input type="button" value="准备" @click="ready()">
     <input type="button" value="开始" @click="start()">
     <input type="button" value="返回大厅" @click="leave()">
@@ -30,6 +31,12 @@ export default {
     },
     players () {
       return this.currentGameRoom.players
+    },
+    playerNum () {
+      return this.currentGameRoom.players.length
+    },
+    limit () {
+      return this.currentGameRoom.limit
     }
   },
   methods: {
@@ -37,7 +44,8 @@ export default {
       'switchUserState',
       'leaveGameRoom',
       'refreshGameRoomStatus',
-      'leaveChat'
+      'leaveChat',
+      'addBot'
     ]),
     ready () {
       this.switchUserState()
@@ -49,13 +57,23 @@ export default {
           nav.go('lobby')
         })
     },
+    _addBot () {
+      this.addBot()
+        .catch(() => {
+          // TODO: notify room full
+        })
+    },
     start () {
       // TODO
-      ws.getSocket().emit('game', {
-        head: 'start',
+      ws.emit('game', {
+        head: 'forward',
         body: {
           gameName: 'uno',
-          roomId: this.roomId,
+          action: 'start',
+          payload: {
+            roomId: this.roomId,
+            players: this.players
+          }
         }
       })
 
@@ -66,23 +84,20 @@ export default {
 
     ws.register ({
       module: 'room',
-      handler (res) {
-        switch (res.head) {
-          case 'updateRoomStatus':
-            _this.refreshGameRoomStatus({
-              players: res.body
-            })
-            break
-          case 'gameStart':
-            nav.go(res.body.gameName)
-            break;
-          default:
-            break
+      main (res) {
+        if (res.head === 'updateRoomStatus') {
+          _this.refreshGameRoomStatus({ players: res.body })
+        }
+      },
+      game (res) {
+        if (res.head === 'gameStart') {
+          // TODO: uno state update
+          nav.go(res.body.gameName)
         }
       }
     })
   }
-};
+}
 </script>
 
 <style lang="css">

@@ -42,14 +42,8 @@ export default {
 
     ws.register ({
       module: 'lobby-player',
-      handler (res) {
-        switch (res.head) {
-          case 'updateOnlineStatus':
-            _this.refresh()
-            break
-          default:
-            break
-        }
+      main (res) {
+        if(res.head === 'updateOnlineStatus') _this.refresh()
       }
     })
   }

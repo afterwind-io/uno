@@ -25,6 +25,13 @@ const mutations = {
   GAMEROOM_SET_PLAYERS (state, players) {
     state.currentRoom.players.splice(0)
     state.currentRoom.players.push(...players)
+  },
+  GAMEROOM_ADD_BOT (state) {
+    state.currentRoom.players.push({
+      name: 'AI玩家',
+      type: 'bot',
+      status: 1
+    })
   }
 }
 
@@ -61,6 +68,16 @@ const actions = {
   },
   refreshGameRoomStatus ({ state, commit }, { players }) {
     commit('GAMEROOM_SET_PLAYERS', players)
+  },
+  addBot ({ state, commit }) {
+    return new Promise((resolve, reject) => {
+      if (state.currentRoom.players.length < state.currentRoom.limit) {
+        commit('GAMEROOM_ADD_BOT')
+        resolve()
+      } else {
+        reject()
+      }
+    })
   }
 }
 

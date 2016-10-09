@@ -97,6 +97,7 @@ module.exports.create = (
   let room = new Room({
     id,
     name: info.name,
+    limit: info.limit,
     isPublic: info.isPublic,
     password: info.password
   })

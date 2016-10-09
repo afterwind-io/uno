@@ -38,6 +38,7 @@ const actions = {
     })
   },
   switchUserState ({ state, commit }) {
+    // TODO: 房间内players中自己的状态没有改变
     let fn = state.user.status === 0
       ? api.iamReady
       : api.iamIdle

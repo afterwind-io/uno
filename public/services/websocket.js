@@ -2,15 +2,9 @@ import { wsServerUrl } from '../config.js'
 import ws from 'socket.io-client'
 import debug from './debug.js'
 
-const _TUNNEL = 'main'
 let _socket
 let _modules = new Set()
 let _debugger = debug.getDebugger('ws')
-
-function _emit (msg) {
-  _debugger.done('[msg] =>', JSON.stringify(msg))
-  _socket.emit(_TUNNEL, msg)
-}
 
 export default {
   init () {
@@ -19,30 +13,28 @@ export default {
     }
   },
   login (params) {
-    if (typeof _socket === 'undefined') return
-
-    _emit({ head: 'login', body: params })
+    return typeof _socket !== 'undefined'
+      ? this.emit('main', { head: 'login', body: params }) : undefined
   },
   logout () {
-    if (typeof _socket === 'undefined') return
-
-    _emit({ head: 'logout', body: '' })
+    return typeof _socket !== 'undefined'
+      ? this.emit('main', { head: 'logout', body: '' }) : undefined
   },
-  register ({module, handler}) {
+  register ({module, ...handlers}) {
     if (typeof _socket === 'undefined') return
     if (_modules.has(module)) return
 
     _modules.add(module)
-    _socket.on(_TUNNEL, msg => {
-      _debugger.done('[msg] <=', JSON.stringify(msg))
-      handler(msg)
-    })
 
-    return {
-      send: _emit
+    for (var channel in handlers) {
+      _socket.on(channel, msg => {
+        _debugger.done('[msg] <=', JSON.stringify(msg))
+        handlers[channel](msg)
+      })
     }
   },
-  getSocket () {
-    return _socket
+  emit (channel, msg) {
+    _debugger.done('[msg] =>', JSON.stringify(msg))
+    _socket.emit(channel, msg)
   }
 }

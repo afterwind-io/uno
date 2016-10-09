@@ -46,17 +46,9 @@ export default {
 
     ws.register ({
       module: 'chat',
-      handler (res) {
-        switch (res.head) {
-          case 'chat':
-            _this.addChat(res.body)
-            break
-          case 'chatInitReq':
-            _this.createChatRoom(res.body)
-            break
-          default:
-            break
-        }
+      main (res) {
+        if(res.head === 'chat') _this.addChat(res.body)
+        if(res.head === 'chatInitReq') _this.createChatRoom(res.body)
       }
     })
   }
