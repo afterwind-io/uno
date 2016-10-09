@@ -10,6 +10,8 @@ import room from './pages/room.vue'
 import about from './pages/about.vue'
 import p404 from './pages/404.vue'
 
+import uno from './games/uno/index.vue'
+
 export default new Router({
   // mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
@@ -20,6 +22,7 @@ export default new Router({
       children: [
         { path: '', name: 'lobby', component: lobby },
         { path: '/room', name: 'room', component: room },
+        { path: '/uno', name: 'uno', component: uno },
         { path: '/about', name: 'about', component: about }
       ]},
     { path: '/404', name: '404', component: p404 },

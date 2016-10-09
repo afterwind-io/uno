@@ -38,10 +38,18 @@ class Uno {
   push () {
     return new Promise((resolve, reject) => {
       resolve({
-        player: this.players[this.pointer],
-        lastCard: this.currentCard,
-        state: this.state,
-        penalties: this.deck.penalties
+        game: {
+          state: this.state,
+          currentCard: this.currentCard,
+          currentPlayer: this.players[this.pointer],
+          penalties: this.deck.penalties
+        },
+        players: this.players.map(p => {
+          return {
+            name: p.name,
+            remains: p.cards.length
+          }
+        })
       })
     })
   }

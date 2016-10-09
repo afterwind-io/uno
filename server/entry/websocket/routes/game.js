@@ -19,6 +19,16 @@ const handlers = {
   },
 
   /**
+   * 用户通过ws总线发起游戏开始请求
+   */
+  start ({gameName, roomId}, socket, io) {
+    io.to(roomId).emit('main', {
+      head: 'gameStart',
+      body: { gameName }
+    })
+  },
+
+  /**
    * 用户通过ws总线向游戏服务器转发消息
    */
   forward ({ gameName, action, payload }, socket, io) {

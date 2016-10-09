@@ -4,8 +4,8 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin')
 module.exports = {
   entry: {
     app: [
-      // 'webpack-dev-server/client?http://localhost:3000/',
-      'webpack-dev-server/client?http://192.168.1.4:3000/',
+      'webpack-dev-server/client?http://localhost:3000/',
+      // 'webpack-dev-server/client?http://192.168.1.4:3000/',
       'webpack/hot/dev-server',
       './public/app.js'
     ],

@@ -1,35 +1,35 @@
 <template>
   <div class="card" :style="bgColorLight">
     <div class="inner" :style="bgColorNormal">
-      <p class="lt">{{symbol}}</p>
-      <p class="rb">{{symbol}}</p>
+      <p class="lt">{{card.symbol}}</p>
+      <p class="rb">{{card.symbol}}</p>
     </div>
     <div class="center" :style="bgColorLight"></div>
-    <p class="number" :style="fgColor">{{symbol}}</p>
+    <p class="number" :style="fgColor">{{card.symbol}}</p>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['color', 'symbol'],
+  props: ['card'],
   computed: {
     bgColorLight () {
-      if(this.color === 'red') return {'background-color': 'rgb(255, 245, 245)'}
-      if(this.color === 'green') return {'background-color': 'rgb(245, 255, 245)'}
-      if(this.color === 'blue') return {'background-color': 'rgb(245, 245, 255)'}
-      if(this.color === 'yellow') return {'background-color': 'rgb(255, 255, 245)'}
+      if(this.card.color === 'red') return {'background-color': 'rgb(255, 245, 245)'}
+      if(this.card.color === 'green') return {'background-color': 'rgb(245, 255, 245)'}
+      if(this.card.color === 'blue') return {'background-color': 'rgb(245, 245, 255)'}
+      if(this.card.color === 'yellow') return {'background-color': 'rgb(255, 255, 245)'}
     },
     bgColorNormal () {
-      if(this.color === 'red') return {'background-color': 'rgb(255, 150, 150)'}
-      if(this.color === 'green') return {'background-color': 'rgb(150, 255, 150)'}
-      if(this.color === 'blue') return {'background-color': 'rgb(150, 150, 255)'}
-      if(this.color === 'yellow') return {'background-color': 'rgb(255, 255, 150)'}
+      if(this.card.color === 'red') return {'background-color': 'rgb(255, 150, 150)'}
+      if(this.card.color === 'green') return {'background-color': 'rgb(150, 255, 150)'}
+      if(this.card.color === 'blue') return {'background-color': 'rgb(150, 150, 255)'}
+      if(this.card.color === 'yellow') return {'background-color': 'rgb(255, 255, 150)'}
     },
     fgColor () {
-      if(this.color === 'red') return {'color': 'rgb(255, 150, 150)'}
-      if(this.color === 'green') return {'color': 'rgb(150, 255, 150)'}
-      if(this.color === 'blue') return {'color': 'rgb(150, 150, 255)'}
-      if(this.color === 'yellow') return {'color': 'rgb(255, 255, 150)'}
+      if(this.card.color === 'red') return {'color': 'rgb(255, 150, 150)'}
+      if(this.card.color === 'green') return {'color': 'rgb(150, 255, 150)'}
+      if(this.card.color === 'blue') return {'color': 'rgb(150, 150, 255)'}
+      if(this.card.color === 'yellow') return {'color': 'rgb(255, 255, 150)'}
     }
   }
 }

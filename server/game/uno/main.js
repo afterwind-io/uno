@@ -1,3 +1,4 @@
+const Player = require('./models/player.js')
 const Uno = require('./uno.js')
 
 const games = []
@@ -11,7 +12,8 @@ const broadcast = (socket, roomId, action, payload) => {
 
 const handlers = {
   start ({ roomId, players }, socket) {
-    let game = new Uno(roomId, players)
+    let unoPlayers = players.map(p => new Player(p))
+    let game = new Uno(roomId, unoPlayers)
     games.push(game)
 
     game.init()

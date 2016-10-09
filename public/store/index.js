@@ -5,6 +5,7 @@ import chat from './modules/chat.js'
 import room from './modules/room.js'
 import player from './modules/player.js'
 import popups from './modules/popups.js'
+import uno from '../games/uno/store.js'
 
 Vue.use(Vuex)
 
@@ -14,7 +15,8 @@ export default new Vuex.Store({
     chat,
     room,
     player,
-    popups
+    popups,
+    uno
   },
   strict: true
 })

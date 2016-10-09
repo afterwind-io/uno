@@ -1,5 +1,5 @@
-// const server = 'http://localhost'
-const server = 'http://192.168.1.4'
+const server = 'http://localhost'
+// const server = 'http://192.168.1.4'
 
 export var apiServerUrl = server + ':4000'
 

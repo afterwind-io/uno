@@ -52,16 +52,13 @@ export default {
     start () {
       // TODO
       ws.getSocket().emit('game', {
-        head: 'forward',
+        head: 'start',
         body: {
           gameName: 'uno',
-          action: 'start',
-          payload: {
-            roomId: this.roomId,
-            players: this.players
-          }
+          roomId: this.roomId,
         }
       })
+
     }
   },
   created () {
@@ -76,6 +73,9 @@ export default {
               players: res.body
             })
             break
+          case 'gameStart':
+            nav.go(res.body.gameName)
+            break;
           default:
             break
         }
