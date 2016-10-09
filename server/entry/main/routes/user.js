@@ -15,6 +15,11 @@ router.post('/register', (
 ) => {
   flow(function* () {
     try {
+      let isRegistered = yield proxyLTS('check', {
+        name: body.name
+      })
+      if (isRegistered) throw new Error('该用户已注册')
+
       let playerInfo = yield proxyLTS('create', {
         name: body.name,
         password: body.password

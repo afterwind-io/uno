@@ -21,7 +21,7 @@ const mutations = {
 
 const actions = {
   register ({ state, commit }, info) {
-    return api.login(info).then(res => {
+    return api.register(info).then(res => {
       commit('USER_SET', res)
       return res
     })

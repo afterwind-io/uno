@@ -59,6 +59,14 @@ playerSchema.statics.get = (
   }
 })
 
+playerSchema.statics.check = (
+  { name }
+) => flow(function* () {
+  let player = yield model.findOne({ name: name }).exec()
+
+  return player !== null
+})
+
 playerSchema.statics.update = (
   { name, password }
 ) => flow(function* () {
