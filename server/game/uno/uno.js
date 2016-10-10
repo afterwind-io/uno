@@ -46,8 +46,10 @@ class Uno {
         },
         players: this.players.map(p => {
           return {
+            lastCard: p.lastCard,
+            uid: p.uid,
             name: p.name,
-            remains: p.cards.length
+            type: p.type
           }
         })
       })

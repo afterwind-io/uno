@@ -28,13 +28,13 @@ export default {
 
     for (var channel in handlers) {
       _socket.on(channel, msg => {
-        _debugger.done('[msg] <=', JSON.stringify(msg))
+        _debugger.done(`[msg] ${channel} <=`, JSON.stringify(msg))
         handlers[channel](msg)
       })
     }
   },
   emit (channel, msg) {
-    _debugger.done('[msg] =>', JSON.stringify(msg))
+    _debugger.done(`[msg] ${channel} =>`, JSON.stringify(msg))
     _socket.emit(channel, msg)
   }
 }

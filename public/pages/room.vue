@@ -45,7 +45,8 @@ export default {
       'leaveGameRoom',
       'refreshGameRoomStatus',
       'leaveChat',
-      'addBot'
+      'addBot',
+      'unoUpdateGameState'
     ]),
     ready () {
       this.switchUserState()
@@ -89,10 +90,10 @@ export default {
           _this.refreshGameRoomStatus({ players: res.body })
         }
       },
-      game (res) {
+      uno (res) {
         if (res.head === 'gameStart') {
-          // TODO: uno state update
-          nav.go(res.body.gameName)
+          _this.unoUpdateGameState(res.body)
+          nav.go('uno')
         }
       }
     })

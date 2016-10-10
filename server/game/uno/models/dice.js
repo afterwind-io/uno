@@ -4,4 +4,4 @@ class Dice {
   }
 }
 
-export { Dice }
+module.exports = Dice

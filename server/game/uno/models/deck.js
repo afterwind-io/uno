@@ -91,4 +91,4 @@ class Deck {
   }
 }
 
-module.export = Deck
+module.exports = Deck

@@ -22,7 +22,7 @@ const handlers = {
    * 用户通过ws总线发起游戏开始请求
    */
   start ({gameName, roomId}, socket, io) {
-    io.to(roomId).emit('main', {
+    io.to(roomId).emit('game', {
       head: 'gameStart',
       body: { gameName }
     })

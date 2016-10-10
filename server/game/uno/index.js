@@ -1,6 +1,7 @@
 const logger = require('../../middlewares/logger.js')('UNO ')
 const ports = require('../../config.js').ports
 const io = require('socket.io-client')
+const main = require('./main.js')
 
 module.exports = {
   start () {
@@ -9,14 +10,9 @@ module.exports = {
       head: 'register',
       body: { gameName: 'uno' }
     })
-    socket.on('game', msg => {
-      console.log(JSON.stringify(msg))
-    })
-    // const handlers = {
-    //   call ({ roomId, uid, card }, socket, io) {
-    //     io.to('uno-server').emit('game', { roomId, uid, card })
-    //   }
-    // }
+
+    main.hook(socket)
+
     // console.log(`[Service][Redis][Room]Starts on :${port}`)
   }
 }

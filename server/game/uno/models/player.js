@@ -3,9 +3,12 @@ const Card = require('./card.js')
 const Deck = require('./deck.js')
 
 class Player {
-  constructor () {
+  constructor ({ roomId, uid, name, type }) {
     this.cards = []
     this.lastCard = {}
+    this.uid = uid
+    this.name = name
+    this.type = type || 'doge'
   }
 
   init (cards) {
@@ -148,4 +151,4 @@ class Player {
   }
 }
 
-export { Player }
+module.exports = Player

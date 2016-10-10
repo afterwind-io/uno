@@ -1,12 +1,12 @@
 const text = require('../utils.js')
+const ACTION_TYPE = ['R', 'S', 'C', 'D2', 'D4']
+const VIRTUAL_TYPE = ['pnb', 'pno', 'pas', 'skp', 'clr', 'clg']
 
 class Card {
   constructor (color, symbol) {
     this.color = color
     this.symbol = symbol
     this.legal = false
-    this.ACTION_TYPE = ['R', 'S', 'C', 'D2', 'D4']
-    this.VIRTUAL_TYPE = ['pnb', 'pno', 'pas', 'skp', 'clr', 'clg']
   }
 
   // 用于标识返回罚牌（被罚牌后立即出罚牌）
@@ -65,11 +65,11 @@ class Card {
   }
 
   isActionCard () {
-    return this.ACTION_TYPE.indexOf(this.symbol) !== -1
+    return ACTION_TYPE.indexOf(this.symbol) !== -1
   }
 
   isEntityCard () {
-    return this.VIRTUAL_TYPE.indexOf(this.symbol) === -1
+    return VIRTUAL_TYPE.indexOf(this.symbol) === -1
   }
 
   isSameCard (card) {
@@ -79,7 +79,7 @@ class Card {
   getScore () {
     if (this.symbol === 'D4') return 50
     if (this.symbol === '0') return 10
-    if (this.ACTION_TYPE.indexOf(this.symbol) !== -1) return 20
+    if (ACTION_TYPE.indexOf(this.symbol) !== -1) return 20
     return parseInt(this.symbol)
   }
 
@@ -94,4 +94,4 @@ class Card {
   }
 }
 
-module.export = Card
+module.exports = Card
