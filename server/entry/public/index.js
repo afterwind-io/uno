@@ -7,7 +7,6 @@ const ports = require('../../config.js').ports
 // 启动本地Webpack Dev Server
 const WebpackDevServer = require('webpack-dev-server')
 const server = new WebpackDevServer(compiler, {
-  inline: true,
   hot: true,
   noInfo: true,
   stats: { colors: true },
