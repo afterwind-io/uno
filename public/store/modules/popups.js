@@ -11,7 +11,7 @@ const getters = {
 }
 
 const mutations = {
-  SWITCH_POP_CREATEGAMEROOM (state) {
+  POP_SWITCH_CREATEGAMEROOM (state) {
     state.popSwitches.createGameRoom =
      !state.popSwitches.createGameRoom
   }
@@ -19,7 +19,7 @@ const mutations = {
 
 const actions = {
   switchPopCreateGameRoom ({ state, commit }) {
-    commit('SWITCH_POP_CREATEGAMEROOM')
+    commit('POP_SWITCH_CREATEGAMEROOM')
   }
 }
 

@@ -4,7 +4,7 @@ const VIRTUAL_TYPE = ['pnb', 'pno', 'pas', 'skp', 'clr', 'clg']
 
 class Card {
   constructor (color, symbol) {
-    this.color = color
+    this.color = color || ''
     this.symbol = symbol
     this.legal = false
   }
@@ -29,11 +29,12 @@ class Card {
     return new Card('', 'skp')
   }
 
-  // 用于标志换色（响应换色牌）
+  // 用于标识换色（响应换色牌）
   static color (color) {
     return new Card(color, 'clr')
   }
 
+  // 用于标识挑战d4
   static challenge () {
     return new Card('', 'clg', '')
   }

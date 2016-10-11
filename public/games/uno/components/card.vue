@@ -18,18 +18,21 @@ export default {
       if(this.card.color === 'green') return {'background-color': 'rgb(245, 255, 245)'}
       if(this.card.color === 'blue') return {'background-color': 'rgb(245, 245, 255)'}
       if(this.card.color === 'yellow') return {'background-color': 'rgb(255, 255, 245)'}
+      return {'background-color': 'rgb(245, 245, 245)'}
     },
     bgColorNormal () {
       if(this.card.color === 'red') return {'background-color': 'rgb(255, 150, 150)'}
       if(this.card.color === 'green') return {'background-color': 'rgb(150, 255, 150)'}
       if(this.card.color === 'blue') return {'background-color': 'rgb(150, 150, 255)'}
       if(this.card.color === 'yellow') return {'background-color': 'rgb(255, 255, 150)'}
+      return {'background-color': 'rgb(150, 150, 150)'}
     },
     fgColor () {
       if(this.card.color === 'red') return {'color': 'rgb(255, 150, 150)'}
       if(this.card.color === 'green') return {'color': 'rgb(150, 255, 150)'}
       if(this.card.color === 'blue') return {'color': 'rgb(150, 150, 255)'}
       if(this.card.color === 'yellow') return {'color': 'rgb(255, 255, 150)'}
+      return {'color': 'rgb(150, 150, 150)'}
     }
   }
 }
@@ -44,22 +47,22 @@ export default {
 
 .card{
   position: relative;
-  height: 320px;
-  width: 200px;
-  padding: 16px;
-  border-radius: 10px;
+  height: 160px;
+  width: 100px;
+  padding: 8px;
+  border-radius: 5px;
   overflow: hidden;
   box-shadow:
-    0px 5px 16px 1px rgba(150, 150, 150, 0.8),
-    0px -1px 2px 0px rgba(150, 150, 150, 0.8) inset,
-    0px 1px 2px 0px rgba(255, 255, 255, 0.8) inset
+    0px 2px 4px 1px rgba(150, 150, 150, 0.5),
+    0px -1px 1px 0px rgba(150, 150, 150, 0.8) inset,
+    0px 1px 1px 0px rgba(255, 255, 255, 0.8) inset
 }
 
 .inner{
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 .number{
@@ -68,15 +71,15 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  line-height: 320px;
+  line-height: 160px;
   text-align: center;
-  font-size: 100px;
+  font-size: 50px;
 }
 
 .lt, .rb{
   position: absolute;
-  line-height: 42px;
-  font-size: 42px;
+  line-height: 21px;
+  font-size: 21px;
   color: white;
 }
 
@@ -98,8 +101,8 @@ export default {
   right: 0;
   bottom: 0;
   margin: auto;
-  height: 140px;
-  width: 200px;
+  height: 70px;
+  width: 100px;
   border-radius: 50%;
   transform: rotate(-45deg);
 }

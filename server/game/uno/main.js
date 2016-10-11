@@ -10,7 +10,7 @@ const broadcast = (socket, roomId, action, payload) => {
     body: { gameName: 'uno', roomId, action, payload }
   })
 
-  console.log(`[uno] => [broadcast]${action}: ${JSON.stringify(payload)}`)
+  // console.log(`[uno] => [broadcast]${action}: ${JSON.stringify(payload)}`)
 }
 
 const handlers = {
@@ -21,9 +21,11 @@ const handlers = {
 
     game.init()
       .then(piles => {
+        broadcast(socket, roomId, 'ready', {})
+
         piles.forEach((p, i) => {
           if (players[i].type === 'bot') {
-            players[i].init(p)
+            game.players[i].init(p)
           } else {
             broadcast(socket, roomId, 'deal', {
               player: players[i].uid,
@@ -35,12 +37,12 @@ const handlers = {
         return game.push()
       })
       .then(payload => {
-        broadcast(socket, roomId, 'gameStart', payload)
+        broadcast(socket, roomId, 'update', payload)
 
         // 如果下一个为ai玩家则推送状态至本地ai
-        let player = payload.game.currentPlayer
-        if (player.type === 'bot') {
-          let deals = player.move({
+        let currentPlayer = game.players[game.pointer]
+        if (currentPlayer.type === 'bot') {
+          let deals = currentPlayer.move({
             state: payload.game.state,
             penalties: payload.game.penalties
           })
@@ -66,6 +68,7 @@ const handlers = {
 
     game.step(deals)
       .then(isEnd => {
+        if (game.turns > 200) throw new Error('???')
         if (isEnd) {
           // TODO
           // broadcast(socket, roomId, 'end', payload)
@@ -79,12 +82,12 @@ const handlers = {
 
         // TODO: 方法提取
         // 如果下一个为ai玩家则推送请求至本地ai
-        let player = payload.game.currentPlayer
-        if (player.type === 'bot') {
-          let deals = player.move({
-            state: payload.game.state,
-            penalties: payload.game.penalties
-          })
+        let currentPlayer = game.players[game.pointer]
+        if (currentPlayer.type === 'bot') {
+          let deals = currentPlayer.move(
+            game.state,
+            game.deck.penalties
+          )
 
           // 模拟用户请求返回ai计算结果
           socket.emit('game', {
@@ -110,7 +113,7 @@ module.exports = {
       if (handlers.hasOwnProperty(event)) {
         handlers[event](msg.body, socket)
 
-        console.log(`[uno] <= [${msg.head}][${JSON.stringify(msg.body)}]`)
+        // console.log(`[uno] <= [${msg.head}][${JSON.stringify(msg.body)}]`)
       }
     })
   }

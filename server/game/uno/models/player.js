@@ -1,3 +1,4 @@
+const idGen = require('../../../utils/idGen.js')
 const Dice = require('./dice.js')
 const Card = require('./card.js')
 const Deck = require('./deck.js')
@@ -6,9 +7,11 @@ class Player {
   constructor ({ roomId, uid, name, type }) {
     this.cards = []
     this.lastCard = {}
-    this.uid = uid
-    this.name = name
     this.type = type || 'doge'
+    this.uid = this.type === 'bot'
+      ? idGen()
+      : uid
+    this.name = name
   }
 
   init (cards) {
@@ -57,6 +60,7 @@ class Player {
           cards = [Card.pass()]
         }
 
+        this.lastCard = cards[0]
         return cards
     }
   }

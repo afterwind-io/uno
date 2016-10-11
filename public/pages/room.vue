@@ -91,8 +91,7 @@ export default {
         }
       },
       uno (res) {
-        if (res.head === 'gameStart') {
-          _this.unoUpdateGameState(res.body)
+        if (res.head === 'ready') {
           nav.go('uno')
         }
       }

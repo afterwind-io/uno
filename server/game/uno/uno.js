@@ -41,7 +41,10 @@ class Uno {
         game: {
           state: this.state,
           currentCard: this.currentCard,
-          currentPlayer: this.players[this.pointer],
+          currentPlayer: {
+            type: this.players[this.pointer].type,
+            uid: this.players[this.pointer].uid
+          },
           penalties: this.deck.penalties
         },
         players: this.players.map(p => {
@@ -49,7 +52,8 @@ class Uno {
             lastCard: p.lastCard,
             uid: p.uid,
             name: p.name,
-            type: p.type
+            type: p.type,
+            remains: p.cards.length
           }
         })
       })
@@ -139,15 +143,9 @@ class Uno {
   step (deals) {
     return new Promise((resolve, reject) => {
       let _deals = deals.map(d => new Card(d.color, d.symbol))
-      this.printServerState()
-
       let currentPlayer = this.players[this.pointer]
-      // let playerDeals = currentPlayer.move(
-      //   this.state,
-      //   this.deck.penalties
-      // )
 
-      this.printPlayerDeal(deals)
+      this.printPlayerDeal(_deals)
 
       if (currentPlayer.cards.length === 0) {
         // TODO 结束判断
@@ -160,6 +158,7 @@ class Uno {
         this.pushPointer(this.currentCard)
         this.toss(_deals)
         this.turns++
+        this.printServerState()
         resolve(false)
       }
     })
