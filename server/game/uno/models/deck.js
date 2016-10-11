@@ -60,7 +60,9 @@ class Deck {
   }
 
   pickFirst () {
-    return this.deck.splice(0, 1)[0]
+    let first = this.deck.splice(0, 1)
+    this.toss(first)
+    return first[0]
   }
 
   pickPenalty (num) {

@@ -16,93 +16,18 @@ const broadcast = (socket, roomId, action, payload) => {
 const handlers = {
   start ({ roomId, players }, socket) {
     let unoPlayers = players.map(p => new Player(p))
-    let game = new Uno(unoPlayers)
+    let game = new Uno(socket, roomId, unoPlayers)
     games.set(roomId, game)
 
-    game.init()
-      .then(piles => {
-        broadcast(socket, roomId, 'ready', {})
-
-        piles.forEach((p, i) => {
-          if (players[i].type === 'bot') {
-            game.players[i].init(p)
-          } else {
-            broadcast(socket, roomId, 'deal', {
-              player: players[i].uid,
-              cards: p
-            })
-          }
-        })
-
-        return game.push()
-      })
-      .then(payload => {
-        broadcast(socket, roomId, 'update', payload)
-
-        // 如果下一个为ai玩家则推送状态至本地ai
-        let currentPlayer = game.players[game.pointer]
-        if (currentPlayer.type === 'bot') {
-          let deals = currentPlayer.move({
-            state: payload.game.state,
-            penalties: payload.game.penalties
-          })
-
-          // 模拟用户请求返回ai计算结果
-          socket.emit('game', {
-            head: 'forward',
-            body: {
-              gameName: 'uno',
-              action: 'call',
-              payload: {
-                roomId,
-                deals
-              }
-            }
-          })
-        }
-      })
+    broadcast(socket, roomId, 'ready', {})
+    game.start()
   },
   call ({ roomId, deals }, socket) {
     let game = games.get(roomId)
     if (!game) return
 
-    game.step(deals)
-      .then(isEnd => {
-        if (game.turns > 200) throw new Error('???')
-        if (isEnd) {
-          // TODO
-          // broadcast(socket, roomId, 'end', payload)
-          // games.delete(roomId)
-        } else {
-          return game.push()
-        }
-      })
-      .then(payload => {
-        broadcast(socket, roomId, 'update', payload)
-
-        // TODO: 方法提取
-        // 如果下一个为ai玩家则推送请求至本地ai
-        let currentPlayer = game.players[game.pointer]
-        if (currentPlayer.type === 'bot') {
-          let deals = currentPlayer.move(
-            game.state,
-            game.deck.penalties
-          )
-
-          // 模拟用户请求返回ai计算结果
-          socket.emit('game', {
-            head: 'forward',
-            body: {
-              gameName: 'uno',
-              action: 'call',
-              payload: {
-                roomId,
-                deals
-              }
-            }
-          })
-        }
-      })
+    let currentPlayer = game.players[game.pointer]
+    currentPlayer.moveAsync(deals)
   }
 }
 

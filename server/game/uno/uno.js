@@ -1,11 +1,13 @@
-const Card = require('./models/card.js')
 const Deck = require('./models/deck.js')
+const flow = require('../../utils/async.js').flow
 const text = require('./utils.js')
 
 class Uno {
-  constructor (players) {
-    this.deck = {}
+  constructor (socket, roomId, players) {
+    this.socket = socket
+    this.roomId = roomId
     this.players = players
+    this.deck = {}
     this.state = {
       color: '',
       symbol: '',
@@ -22,82 +24,39 @@ class Uno {
     this.turns = 1
   }
 
-  init () {
-    return new Promise((resolve, reject) => {
-      this.deck = new Deck()
-      this.currentCard = this.deck.pickFirst()
-      this.pushState(this.currentCard)
-
-      let piles = this.deck.deal(this.players.length)
-      piles.forEach((p, i) => { this.players[i].init(p) })
-
-      resolve(piles)
-    })
-  }
-
-  push () {
-    return new Promise((resolve, reject) => {
-      resolve({
-        game: {
-          state: this.state,
-          currentCard: this.currentCard,
-          currentPlayer: {
-            type: this.players[this.pointer].type,
-            uid: this.players[this.pointer].uid
-          },
-          penalties: this.deck.penalties
-        },
-        players: this.players.map(p => {
-          return {
-            lastCard: p.lastCard,
-            uid: p.uid,
-            name: p.name,
-            type: p.type,
-            remains: p.cards.length
-          }
-        })
-      })
-    })
-  }
-
-  printServerState () {
-    let handNum = text.padLeft(this.players.reduce((s, p) => s + p.cards.length, 0), 3)
-    let deckNum = text.padLeft(this.deck.deck.length, 3)
-    let discardsNum = text.padLeft(this.deck.discards.length, 3)
-    let penaltyNum = text.padLeft(this.deck.penalties.length, 3)
-    let sum = text.padLeft(parseInt(handNum) + parseInt(deckNum) + parseInt(discardsNum) + parseInt(penaltyNum), 3)
-
-    let d4 = this.state.d4 ? 'true ' : 'false'
-    let d2 = this.state.d2 ? 'true ' : 'false'
-    let color = text.padRight(this.state.color, 7)
-    let symbol = text.padRight(this.state.symbol, 3)
-    let action = this.state.action
-
-    console.log(`Server[${handNum}][${deckNum}][${discardsNum}][${penaltyNum}][${sum}]: State[Color: ${color}, Symbol: ${symbol}, +4: ${d4}, +2: ${d2} ] Action[${action}]`)
-  }
-
-  printPlayerDeal (cards) {
-    let card = cards[0]
-    let turn = text.padLeft(this.turns, 3)
-    let player = this.players[this.pointer]
-    let handNum = text.padLeft(player.cards.length, 3)
-    let head = text.padLeft(`[${turn}]Player(${this.pointer})  [${handNum}]`, 31)
-    let handCards = player.cards.reduce((s, c) => `${s + c.toShortenString()}, `, '')
-    console.log(`${head}: ${card.toString()} * ${cards.length} [${handCards}]`)
-  }
-
-  printResult () {
-    console.log('--------RESULT--------')
-
-    this.players.forEach((p, i) => {
-      if (p.cards.length === 0) {
-        console.log(`Player(${i}): Winner`)
-      } else {
-        let score = text.padRight(p.cards.reduce((s, c) => s + c.getScore(), 0), 3)
-        let cards = p.cards.reduce((s, c) => `${s + c.toShortenString()}, `, '')
-        console.log(`Player(${i}): ${score} ${cards}`)
+  broadcast (action, payload) {
+    this.socket.emit('game', {
+      head: 'broadcast',
+      body: {
+        gameName: 'uno',
+        roomId: this.roomId,
+        action,
+        payload
       }
     })
+
+    // console.log(`[uno] => [broadcast]${action}: ${JSON.stringify(payload)}`)
+  }
+
+  start () {
+    this.deck = new Deck()
+    this.currentCard = this.deck.pickFirst()
+    this.pushState(this.currentCard)
+
+    this.deck
+      .deal(this.players.length)
+      .forEach((p, i) => {
+        this.players[i].init(p)
+
+        if (this.players[i].type !== 'bot') {
+          this.broadcast('deal', {
+            player: this.players[i].uid,
+            cards: this.players[i].cards
+          })
+        }
+      })
+
+    this.loop()
   }
 
   movePointer (num = 1) {
@@ -140,28 +99,41 @@ class Uno {
     if (d4 !== null) this.state.d4 = d4
   }
 
-  step (deals) {
-    return new Promise((resolve, reject) => {
-      let _deals = deals.map(d => new Card(d.color, d.symbol))
-      let currentPlayer = this.players[this.pointer]
+  toss (cards) {
+    if (cards[0].isEntityCard()) this.deck.toss(cards)
+  }
 
-      this.printPlayerDeal(_deals)
+  loop () {
+    let _this = this
+    let f = function* () {
+      while (_this.state.action !== 'end' && _this.turns < 1000) {
+        _this.printServerState()
+        _this.push()
 
-      if (currentPlayer.cards.length === 0) {
-        // TODO 结束判断
-        this.state.action = 'end'
-        this.printResult()
-        resolve(true)
-      } else {
-        this.currentCard = _deals[0]
-        this.pushState(this.currentCard)
-        this.pushPointer(this.currentCard)
-        this.toss(_deals)
-        this.turns++
-        this.printServerState()
-        resolve(false)
+        let currentPlayer = _this.players[_this.pointer]
+        let deals = yield currentPlayer.move(
+          _this.state,
+          _this.deck.penalties
+        )
+
+        // TODO: 返回罚牌时应增加手牌而不是丢牌
+        currentPlayer.toss(deals)
+        _this.printPlayerDeal(deals)
+
+        if (currentPlayer.cards.length === 0) {
+          _this.state.action = 'end'
+          _this.printResult()
+        } else {
+          _this.currentCard = deals[0]
+          _this.pushState(_this.currentCard)
+          _this.pushPointer(_this.currentCard)
+          _this.toss(deals)
+          _this.turns++
+        }
       }
-    })
+    }
+
+    flow(f)
   }
 
   pushState (card) {
@@ -252,8 +224,67 @@ class Uno {
     }
   }
 
-  toss (cards) {
-    if (cards[0].isEntityCard()) this.deck.toss(cards)
+  push () {
+    this.broadcast('update', {
+      game: {
+        state: this.state,
+        currentCard: this.currentCard,
+        currentPlayer: {
+          type: this.players[this.pointer].type,
+          uid: this.players[this.pointer].uid
+        },
+        penalties: this.deck.penalties
+      },
+      players: this.players.map(p => {
+        return {
+          lastCard: p.lastCard,
+          uid: p.uid,
+          name: p.name,
+          type: p.type,
+          remains: p.cards.length
+        }
+      })
+    })
+  }
+
+  printServerState () {
+    let handNum = text.padLeft(this.players.reduce((s, p) => s + p.cards.length, 0), 3)
+    let deckNum = text.padLeft(this.deck.deck.length, 3)
+    let discardsNum = text.padLeft(this.deck.discards.length, 3)
+    let penaltyNum = text.padLeft(this.deck.penalties.length, 3)
+    let sum = text.padLeft(parseInt(handNum) + parseInt(deckNum) + parseInt(discardsNum) + parseInt(penaltyNum), 3)
+
+    let d4 = this.state.d4 ? 'true ' : 'false'
+    let d2 = this.state.d2 ? 'true ' : 'false'
+    let color = text.padRight(this.state.color, 7)
+    let symbol = text.padRight(this.state.symbol, 3)
+    let action = this.state.action
+
+    console.log(`Server[${handNum}][${deckNum}][${discardsNum}][${penaltyNum}][${sum}]: State[Color: ${color}, Symbol: ${symbol}, +4: ${d4}, +2: ${d2} ] Action[${action}]`)
+  }
+
+  printPlayerDeal (cards) {
+    let card = cards[0]
+    let turn = text.padLeft(this.turns, 3)
+    let player = this.players[this.pointer]
+    let handNum = text.padLeft(player.cards.length, 3)
+    let head = text.padLeft(`[${turn}]Player(${this.pointer})  [${handNum}]`, 31)
+    let handCards = player.cards.reduce((s, c) => `${s + c.toShortenString()}, `, '')
+    console.log(`${head}: ${card.toString()} * ${cards.length} [${handCards}]`)
+  }
+
+  printResult () {
+    console.log('--------RESULT--------')
+
+    this.players.forEach((p, i) => {
+      if (p.cards.length === 0) {
+        console.log(`Player(${i}): Winner`)
+      } else {
+        let score = text.padRight(p.cards.reduce((s, c) => s + c.getScore(), 0), 3)
+        let cards = p.cards.reduce((s, c) => `${s + c.toShortenString()}, `, '')
+        console.log(`Player(${i}): ${score} ${cards}`)
+      }
+    })
   }
 }
 
