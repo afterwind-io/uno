@@ -4,8 +4,8 @@
   "description": "an experimental web game",
   "main": "index.js",
   "scripts": {
-    "dev": "set NODE_ENV=dev&& nodemon index",
-    "prod": "set NODE_ENV=prod&& nodemon index"
+    "dev": "set NODE_ENV=dev&& node index",
+    "prod": "set NODE_ENV=prod&& node index"
   },
   "author": "AfterWind",
   "license": "ISC",

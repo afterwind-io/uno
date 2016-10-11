@@ -1,0 +1,18 @@
+{
+  "apps": [{
+    "name"        : "uno",
+    "script"      : "./index.js",
+    "watch"       : true,
+    "env": {
+      "NODE_ENV": "dev",
+    },
+    "env_production" : {
+       "NODE_ENV": "prod"
+    },
+    "watch": ["server"],
+    "ignore_watch" : [".git", "node_modules", "redis"],
+    "watch_options": {
+      "followSymlinks": false
+    }
+  }]
+}
