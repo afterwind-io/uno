@@ -4,14 +4,14 @@ const Uno = require('./uno.js')
 const games = new Map()
 // const ai = new Player()
 
-const broadcast = (socket, roomId, action, payload) => {
-  socket.emit('game', {
-    head: 'broadcast',
-    body: { gameName: 'uno', roomId, action, payload }
-  })
-
-  // console.log(`[uno] => [broadcast]${action}: ${JSON.stringify(payload)}`)
-}
+// const broadcast = (socket, roomId, action, payload) => {
+//   socket.emit('game', {
+//     head: 'broadcast',
+//     body: { gameName: 'uno', roomId, action, payload }
+//   })
+//
+//   console.log(`[uno] => [broadcast]${action}: ${JSON.stringify(payload)}`)
+// }
 
 const handlers = {
   start ({ roomId, players }, socket) {
@@ -19,7 +19,6 @@ const handlers = {
     let game = new Uno(socket, roomId, unoPlayers)
     games.set(roomId, game)
 
-    broadcast(socket, roomId, 'ready', {})
     game.start()
   },
   call ({ roomId, deals }, socket) {
@@ -27,7 +26,7 @@ const handlers = {
     if (!game) return
 
     let currentPlayer = game.players[game.pointer]
-    currentPlayer.moveAsync(deals)
+    currentPlayer.moveAsync(game.state, game.deck.penalties, deals)
   }
 }
 

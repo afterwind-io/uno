@@ -20,19 +20,29 @@ class Player {
 
   move (state, penalties) {
     return new Promise((resolve, reject) => {
+      this.rpc = resolve
+
       if (this.type === 'bot') {
         let deals = ai.move(state, this.cards, penalties)
-        if (deals[0].isEntityCard()) this.lastCard = deals[0]
-        resolve(deals)
-      } else {
-        this.rpc = resolve
+        this.moveAsync(state, penalties, deals)
       }
     })
   }
 
-  moveAsync (deals) {
+  moveAsync (state, penalties, deals) {
     deals = deals.map(d => new Card(d.color, d.symbol))
-    if (deals[0].isEntityCard()) this.lastCard = deals[0]
+
+    if (state.action === 'penalty' && (
+        deals[0].symbol === 'pnb' || deals[0].symbol === 'pno'
+    )) {
+      this.cards.push(...penalties)
+    }
+
+    if (deals[0].isEntityCard()) {
+      this.toss(deals)
+      this.lastCard = deals[0]
+    }
+
     this.rpc(deals)
   }
 

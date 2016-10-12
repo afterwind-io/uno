@@ -84,8 +84,6 @@ function strategyReturnPenalty (state, cards, penalties) {
     let penalty = penalties[0]
 
     if (!penalty.isActionCard() && penalty.isLegal(state)) {
-      cards.push(penalty)
-
       if (Dice.roll(2)) {
         cards.forEach(c => { c.legal = false })
         penalty.legal = true
@@ -96,7 +94,6 @@ function strategyReturnPenalty (state, cards, penalties) {
     }
   }
 
-  cards.push(...penalties)
   return [Card.penaltyOver()]
 }
 

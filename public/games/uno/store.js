@@ -31,6 +31,8 @@ const mutations = {
     state.myCards = cards
   },
   UNO_STATE_SET (state, info) {
+    info.game.penalties.forEach(c => { c.isSelected = false })
+
     state.game = info.game
     state.players = info.players
   },

@@ -39,6 +39,8 @@ class Uno {
   }
 
   start () {
+    this.broadcast('ready', {})
+
     this.deck = new Deck()
     this.currentCard = this.deck.pickFirst()
     this.pushState(this.currentCard)
@@ -116,12 +118,11 @@ class Uno {
           _this.deck.penalties
         )
 
-        // TODO: 返回罚牌时应增加手牌而不是丢牌
-        currentPlayer.toss(deals)
         _this.printPlayerDeal(deals)
 
         if (currentPlayer.cards.length === 0) {
           _this.state.action = 'end'
+          _this.push()
           _this.printResult()
         } else {
           _this.currentCard = deals[0]
@@ -170,7 +171,7 @@ class Uno {
         this.setAction('onturn')
         this.addPenalty(4)
         this.d4ColorCallerPtr = this.pointer
-        this.setState(card.color, card.symbol, false, true)
+        this.setState(null, card.symbol, false, true)
         break
       case 'D2':
         this.setAction('onturn')
@@ -182,11 +183,11 @@ class Uno {
         break
       case 'R':
         this.reversePointer()
-        this.setState(card.color, card.symbol, false, false)
+        this.setState(card.color, card.symbol, null, null)
         break
       case 'S':
         this.setAction('skip')
-        this.setState(card.color, card.symbol, false, false)
+        this.setState(card.color, card.symbol, null, null)
         break
       default:
         this.setAction('onturn')
@@ -253,6 +254,7 @@ class Uno {
     let discardsNum = text.padLeft(this.deck.discards.length, 3)
     let penaltyNum = text.padLeft(this.deck.penalties.length, 3)
     let sum = text.padLeft(parseInt(handNum) + parseInt(deckNum) + parseInt(discardsNum) + parseInt(penaltyNum), 3)
+    let pointer = text.padLeft(this.pointer, 2)
 
     let d4 = this.state.d4 ? 'true ' : 'false'
     let d2 = this.state.d2 ? 'true ' : 'false'
@@ -260,7 +262,7 @@ class Uno {
     let symbol = text.padRight(this.state.symbol, 3)
     let action = this.state.action
 
-    console.log(`Server[${handNum}][${deckNum}][${discardsNum}][${penaltyNum}][${sum}]: State[Color: ${color}, Symbol: ${symbol}, +4: ${d4}, +2: ${d2} ] Action[${action}]`)
+    console.log(`Server[${handNum}][${deckNum}][${discardsNum}][${penaltyNum}][${sum}][${pointer}]: State[Color: ${color}, Symbol: ${symbol}, +4: ${d4}, +2: ${d2} ] Action[${action}]`)
   }
 
   printPlayerDeal (cards) {
@@ -268,7 +270,7 @@ class Uno {
     let turn = text.padLeft(this.turns, 3)
     let player = this.players[this.pointer]
     let handNum = text.padLeft(player.cards.length, 3)
-    let head = text.padLeft(`[${turn}]Player(${this.pointer})  [${handNum}]`, 31)
+    let head = text.padLeft(`[${turn}]Player(${this.pointer})  [${handNum}]`, 35)
     let handCards = player.cards.reduce((s, c) => `${s + c.toShortenString()}, `, '')
     console.log(`${head}: ${card.toString()} * ${cards.length} [${handCards}]`)
   }
