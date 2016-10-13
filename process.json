@@ -9,8 +9,8 @@
     "env_production" : {
        "NODE_ENV": "prod"
     },
-    "watch": ["server"],
-    "ignore_watch" : [".git", "node_modules", "redis"],
+    "watch" : ["server"],
+    "ignore_watch" : [".git", "node_modules", "redis", "public"],
     "watch_options": {
       "followSymlinks": false
     }

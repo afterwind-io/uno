@@ -37,9 +37,8 @@ module.exports = {
       test: /\.less$/,
       loader: ExtractTextPlugin.extract('style', 'css!less')
     }, {
-      test: /\.(png|jpg)$/,
-      exclude: /node_modules/,
-      loader: 'url'
+      test: /\.(eot|woff|woff2|ttf|svg|png|jpg)$/,
+      loader: 'url-loader'
     }]
   },
   plugins: [
