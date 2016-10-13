@@ -2,6 +2,7 @@ import Vue from 'vue'
 import router from './routes.js'
 import store from './store/index.js'
 import './app.less'
+import './assets/flaticon.less'
 import main from './app.vue'
 
 new Vue({
