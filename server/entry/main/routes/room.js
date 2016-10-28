@@ -30,12 +30,12 @@ router.post('/join', (
         uid: session.uid,
         roomId: body.roomId
       })
-      yield proxyRoom('remPlayer', {
-        roomId: oldRoomId,
-        uid: session.uid
-      })
       yield proxyRoom('addPlayer', {
         roomId: body.roomId,
+        uid: session.uid
+      })
+      yield proxyRoom('remPlayer', {
+        roomId: oldRoomId,
         uid: session.uid
       })
 
@@ -66,12 +66,12 @@ router.post('/leave', (
         uid: session.uid,
         roomId: 0
       })
-      yield proxyRoom('remPlayer', {
-        roomId: oldRoomId,
-        uid: session.uid
-      })
       yield proxyRoom('addPlayer', {
         roomId: 0,
+        uid: session.uid
+      })
+      yield proxyRoom('remPlayer', {
+        roomId: oldRoomId,
         uid: session.uid
       })
 

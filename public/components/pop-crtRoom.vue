@@ -26,7 +26,10 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['isShowCreateGameRoom'])
+    ...mapGetters([
+      'user',
+      'isShowCreateGameRoom'
+    ])
   },
   methods: {
     ...mapActions([
@@ -36,7 +39,9 @@ export default {
       'joinChat'
     ]),
     create () {
-      this.createGameRoom(this.room)
+      let info = this.room
+      info.owner = this.user.uid
+      this.createGameRoom(info)
         .then(res => {
           return this.joinGameRoom(res.id)
         })

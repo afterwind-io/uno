@@ -120,11 +120,11 @@ export default {
   transition: 300ms;
 }
 .page-flip-enter {
-  transform: translateX(-20%) scale(0.8);
+  transform: scale(0.8);
   opacity: 0;
 }
 .page-flip-leave-active {
-  transform: translateX(20%) scale(0.8);
+  transform: scale(1.2);
   opacity: 0;
 }
 

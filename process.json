@@ -2,7 +2,6 @@
   "apps": [{
     "name"        : "uno",
     "script"      : "./index.js",
-    "watch"       : true,
     "env": {
       "NODE_ENV": "dev",
     },
@@ -13,6 +12,7 @@
     "ignore_watch" : [".git", "node_modules", "redis", "public"],
     "watch_options": {
       "followSymlinks": false
-    }
+    },
+    "max_restarts": 50
   }]
 }

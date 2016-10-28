@@ -37,6 +37,7 @@ class Room {
     this.PLAYERS_MAX = 10
     this.id = info.id
     this.name = info.name || `Room ${this.id}`
+    this.owner = info.owner
     this.players = info.players || []
     this.limit = info.limit || this.PLAYERS_MAX
     this.isPublic = info.isPublic || true
@@ -72,7 +73,7 @@ class Room {
   }
 
   toPackage () {
-    return ['id', 'name', 'players', 'limit', 'status']
+    return ['id', 'name', 'owner', 'players', 'limit', 'status']
       .reduce((o, prop) => Object.assign(o, { [prop]: this[prop] }), {})
   }
 
