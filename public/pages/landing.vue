@@ -1,67 +1,63 @@
 <template>
   <div class="mainFrame">
-    <a href="https://github.com/afterwind-io"><img style="position: absolute; top: 0; right: 0; border: 0;" src="../assets/fork-me-on-github.png" alt="Fork me on GitHub"></a>
-
     <header>
 
     </header>
 
     <section>
-      <div class="mainBox">
-        <div class="logoBox">
-          <h1>UNO</h1>
-          <h3>alpha 0.0.1</h3>
-        </div>
-        <div class="infoBox">
-          <div class="contentBox">
-            <transition name="page-flip">
-              <div class="content" v-show="page === 'login'">
-                <div class="loginBox">
-                  <div class="entryBox avatarBox">
-                    <div class="avatar"></div>
-                  </div>
-                  <div class="entryBox entry">
-                    <input type="text" v-model="user.name">
-                    <i class="flaticon-avatar"></i>
+      <div class="logoBox">
+        <h1>UNO</h1>
+        <h3>alpha 0.0.1</h3>
+      </div>
+      <div class="infoBox">
+        <div class="contentBox">
+          <transition name="page-flip">
+            <div class="content" v-show="page === 'login'">
+              <div class="loginBox">
+                <div class="entryBox avatarBox">
+                  <div class="avatar"></div>
+                </div>
+                <div class="entryBox entry">
+                  <input type="text" v-model="user.name">
+                  <i class="flaticon-avatar"></i>
 
-                  </div>
-                  <div class="entryBox entry">
-                    <input type="text" v-model="user.password">
-                    <i class="flaticon-padlock"></i>
+                </div>
+                <div class="entryBox entry">
+                  <input type="text" v-model="user.password">
+                  <i class="flaticon-padlock"></i>
 
-                  </div>
-                  <div class="entryBox funcBox">
-                    <p type="button" @click="_register">注册</p>
-                    <p type="button" @click="_login">登录</p>
-                    <!-- <i-arrow :state="arrowState" :whenClick="wow"></i-arrow> -->
-                  </div>
+                </div>
+                <div class="entryBox funcBox">
+                  <p type="button" @click="_register">注册</p>
+                  <p type="button" @click="_login">登录</p>
+                  <!-- <i-arrow :state="arrowState" :whenClick="wow"></i-arrow> -->
                 </div>
               </div>
-            </transition>
-            <transition name="page-flip">
-              <div class="content" v-show="page === 'news'">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </div>
-            </transition>
-            <transition name="page-flip">
-              <div class="content" v-show="page === 'about'">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Modi, eius, quae. Aspernatur dicta reprehenderit eligendi velit sunt neque iste excepturi laboriosam obcaecati quo expedita nihil perspiciatis labore soluta quod, at.
-              </div>
-            </transition>
-          </div>
-          <div class="menu">
-            <ul>
-              <li :class="{'page-focus': page === 'news' }" @click="switchPage('news')">News</li>
-              <li :class="{'page-focus': page === 'login' }" @click="switchPage('login')">Login</li>
-              <li :class="{'page-focus': page === 'about' }" @click="switchPage('about')">About</li>
-            </ul>
-          </div>
+            </div>
+          </transition>
+          <transition name="page-flip">
+            <div class="content" v-show="page === 'news'">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </div>
+          </transition>
+          <transition name="page-flip">
+            <div class="content" v-show="page === 'about'">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Modi, eius, quae. Aspernatur dicta reprehenderit eligendi velit sunt neque iste excepturi laboriosam obcaecati quo expedita nihil perspiciatis labore soluta quod, at.
+            </div>
+          </transition>
+        </div>
+        <div class="menu">
+          <ul>
+            <li :class="{'page-focus': page === 'news' }" @click="switchPage('news')">News</li>
+            <li :class="{'page-focus': page === 'login' }" @click="switchPage('login')">Login</li>
+            <li :class="{'page-focus': page === 'about' }" @click="switchPage('about')">About</li>
+          </ul>
         </div>
       </div>
     </section>
 
     <footer>
-      A personal project by Afterwind. Made by <i class="flaticon-heart"></i>
+      <p>A personal project by Afterwind. Made by <i class="flaticon-heart"></i></p>
     </footer>
   </div>
 </template>
@@ -129,41 +125,45 @@ export default {
 }
 
 .mainFrame {
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 header {
-  flex-grow: 1;
+  height: 10%;
 }
 section {
-  height: 80vh;
-  display: flex;
-  align-items: center;
-  // background-color: rgba(255, 0, 0, 0.5);
-}
-section:before {
-  content: '';
-  float: left;
-  flex-grow: 1;
-}
-section:after {
-  content: '';
-  float: right;
-  flex-grow: 1;
-}
-.mainBox {
   height: 80%;
-  width: 800px;
-  max-height: 500px;
   display: flex;
+  // align-items: flex-start;
+}
+// section:before {
+//   content: '';
+//   float: left;
+//   flex-grow: 1;
+// }
+// section:after {
+//   content: '';
+//   float: right;
+//   flex-grow: 1;
+// }
+footer {
+  height: 10%;
 }
 .logoBox {
+  // background-color: rgba(255, 0, 0, 0.5);
   width: 40%;
+  height: 100%;
   text-align: right;
   padding: 0 20px;
   // border-right: 1px solid rgba(54, 61, 66, 0.2);
+}
+.infoBox {
+  width: 40%;
+  height: 100%;
+  // background-color: rgba(0, 255, 0, 0.5);
 }
 h1 {
   font-size: 108px;
@@ -175,7 +175,6 @@ h3 {
   padding: 0 5px;
 }
 .infoBox {
-  width: 60%;
   background-color: rgba(255, 255, 255, 0.5);
   box-shadow: 0px 2px 2px 2px rgba(54, 61, 66, 0.2);
   display: flex;
@@ -275,8 +274,10 @@ li:hover {
   text-shadow: 0px 2px 2px fade(orange, 30%);
   color: orange;
 }
-footer {
-  flex-grow: 1;
+footer p{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
   text-align: center;
   font-size: 12px;
 }

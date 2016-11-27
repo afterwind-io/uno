@@ -1,9 +1,23 @@
 <template>
   <div class="mainFrame">
-    <h1>Home</h1>
-    <input type="button" @click="_logout" value="退出">
-    <router-view></router-view>
-    <chat></chat>
+    <header>
+      <div></div>
+      <h1>大厅</h1>
+      <p>快速匹配</p>
+      <input type="button" @click="_logout" value="退出">
+
+    </header>
+
+    <section>
+      <router-view></router-view>
+
+    </section>
+
+    <aside class="chat">
+      <chat></chat>
+
+    </aside>
+
     <popups></popups>
   </div>
 </template>
@@ -48,5 +62,34 @@ export default {
 };
 </script>
 
-<style lang="css">
+<style lang="less" scoped>
+@import "../app.less";
+
+header {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 10%;
+  display: flex;
+}
+
+section {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  width: 100%;
+  height: 90%;
+  // background-color: rgba(255, 0, 0, 0.5);
+}
+
+aside {
+  position: absolute;
+  top: 10%;
+  right: 0;
+  width: 20%;
+  height: 90%;
+  background-color: white;
+  box-shadow: @global-shadow-2dp;
+  // background-color: rgba(255, 0, 0, 0.3);
+}
 </style>
